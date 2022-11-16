@@ -1,19 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login Page</title>
 </head>
-<body bgcolor="orange">
-
-<form action="/form_login" method="post">
-  <h2></h2>Username:<br>
-  <input type="text" name='username'><br>
-  Password:<br>
-  <input  name='password' ><br><br>
-<input type="submit" value="Login">
+<body>
+<form action="/loginAuth" method="POST">
+	<input type="text" name = "username" placeholder="username or email" required/> </br>
+	<input type="password" name = "password" placeholder="password" required/></br>
+	<input type="submit" value = Login />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
 </form>
-<h1 >{{info}}</h1>
+
+<a href="/">Go back</a>
 
 </body>
+
+
 </html>
