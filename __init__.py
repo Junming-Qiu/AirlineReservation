@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'walrus123' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = '***' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080
 
