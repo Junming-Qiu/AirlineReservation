@@ -1,10 +1,16 @@
 # Import Flask Library
-#from functions import *
 from flask import Flask, render_template, request, session, url_for, redirect
 from flask_mysqldb import MySQL
-import hashlib
+import os
+import sys
+sys.path.insert(0, os.getcwd())
 
+from functions import *
+global customer_tokens
+global staff_tokens
 
+customer_tokens = {}
+staff_tokens = {}
 # TODO LIST
 # 3. get seperate files working together
 
@@ -17,9 +23,9 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '***' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'Potatooo123!' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
-app.config['MYSQL_PORT'] = 8080
+app.config['MYSQL_PORT'] = 3306
 
 mysql = MySQL(app)
 
@@ -106,17 +112,17 @@ def registerAuthCustomer():
 def loginAuth():
     username_or_email = request.form['username']
     password = request.form['password']
-
-    is_staff = query_staff_credentials(username_or_email, password)
-    is_customer = query_customer_credentials(username_or_email, password)
+  
+    is_staff = query_staff_credentials(username_or_email, password, mysql)
+    is_customer = query_customer_credentials(username_or_email, password, mysql)
 
     if is_staff:
         session['username'] = username_or_email
-        return render_template('index.html') #TODO: CHANGE TO STAFF HOMEPAGE
+        return render_template('staff.html', is_staff = is_staff!=False) #TODO: CHANGE TO STAFF HOMEPAGE
 
     if is_customer:
         session['username'] = username_or_email
-        return render_template('index.html') #TODO: CHANGE TO CUSTOMER HOMEPAGE
+        return render_template('customer.html', is_customer = is_customer!=False) #TODO: CHANGE TO CUSTOMER HOMEPAGE
 
     error = 'Log in credentials are incorrect'
     return render_template('login.html', error=error)

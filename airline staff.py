@@ -15,7 +15,7 @@ from functions import *
 
 
 # 1.1 view flight based on next 30 days
-def staff_view_flight_30_days(AIRLINE: str) -> list[tuple]:
+def staff_view_flight_30_days(AIRLINE: str, mysql) -> list[tuple]:
     today = date_in_X_days(0)
     plus30 = date_in_X_days(30)
     sql = F'''
@@ -24,51 +24,51 @@ def staff_view_flight_30_days(AIRLINE: str) -> list[tuple]:
     WHERE airline = '{AIRLINE}'
         AND dept_datetime BETWEEN {today} AND {plus30};
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.2 view flight based on airline
-def staff_view_flight_airline(AIRLINE: str) -> list[tuple]:
+def staff_view_flight_airline(AIRLINE: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
     FROM flight
     WHERE airline = '{AIRLINE}';
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.3 view flight based on a range of dates
-def staff_view_flight_date_range(START: str, END: str) -> list[tuple]:
+def staff_view_flight_date_range(START: str, END: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
     FROM flight
     WHERE dept_datetime BETWEEN {START} AND {END};
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.4 view flight based on airport source
-def staff_view_flight_airport_origin(ORIGIN: str) -> list[tuple]:
+def staff_view_flight_airport_origin(ORIGIN: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
     FROM flight
     WHERE origin = '{ORIGIN}';
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.5 view flight based on airport destination
-def staff_view_flight_airport_dest(DESTINATION: str) -> list[tuple]:
+def staff_view_flight_airport_dest(DESTINATION: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
     FROM flight
     WHERE origin = '{DESTINATION}';
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.6 view flight based on city origin
-def staff_view_flight_city_origin(CITY: str) -> list[tuple]:
+def staff_view_flight_city_origin(CITY: str, mysql) -> list[tuple]:
     sql = f''' 
     SELECT f.flight_num, f.airline, f.airplane_id,
         f.arrv_datetime, f.dept_datetime, f.base_price,
@@ -76,11 +76,11 @@ def staff_view_flight_city_origin(CITY: str) -> list[tuple]:
     FROM flight as f JOIN airport as a ON f.origin=a.name
     WHERE a.city = '{CITY}';    
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.7 view flight based on city destination
-def staff_view_flight_city_destination(CITY: str) -> list[tuple]:
+def staff_view_flight_city_destination(CITY: str, mysql) -> list[tuple]:
     sql = f''' 
     SELECT f.flight_num, f.airline, f.airplane_id,
         f.arrv_datetime, f.dept_datetime, f.base_price,
@@ -88,11 +88,11 @@ def staff_view_flight_city_destination(CITY: str) -> list[tuple]:
     FROM flight as f JOIN airport as a ON f.destination=a.name
     WHERE a.city = '{CITY}';    
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 1.8 view customers on a flight
-def staff_view_flight_passangers(FNUM: str, AIRLINE: str, DEPT_DT: str) -> list[tuple]:
+def staff_view_flight_passangers(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT c.name, c.email, c.phone_number
     FROM customer as c, purchase as p, ticket as t
@@ -102,13 +102,13 @@ def staff_view_flight_passangers(FNUM: str, AIRLINE: str, DEPT_DT: str) -> list[
         AND t.airline = '{AIRLINE}'
         AND t.dept_datetime = {DEPT_DT};
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 2.1 create a new flight
 def staff_create_flight(FNUM: str, AIRLINE: str, AIRPLANE_ID: str,
                             ARRV_DT: str, DEPT_DT: str, BASE_PRICE: str,
-                            ORGN: str, DEST: str, FSTAUS: str) -> None:
+                            ORGN: str, DEST: str, FSTAUS: str, mysql) -> None:
     sql =f'''
         BEGIN
         IF NOT EXISTS (SELECT * 
@@ -123,11 +123,11 @@ def staff_create_flight(FNUM: str, AIRLINE: str, AIRPLANE_ID: str,
         END
     END;
     '''
-    exec_sql(sql)
+    exec_sql(sql, mysql)
 
 # 3.1 change flight status
 def staff_update_flight_status(FNUM: str, AIRLINE: str,
-                                 DEPT_DT: str, STATUS: str) -> None:
+                                 DEPT_DT: str, STATUS: str, mysql) -> None:
     sql =f'''
     BEGIN
         IF EXISTS (SELECT * 
@@ -144,12 +144,12 @@ def staff_update_flight_status(FNUM: str, AIRLINE: str,
         END
     END;
     '''
-    exec_sql(sql)
+    exec_sql(sql, mysql)
 
 # 4.1 add airplane in the system,
 #   display all airplanes owned by airline
 def staff_create_airplane(ID: str, AIRLINE: str, NUM_SEATS: str,
-                          AGE: str, MANUFACTURER: str) -> list[tuple]:
+                          AGE: str, MANUFACTURER: str, mysql) -> list[tuple]:
     insert_sql = f'''
     BEGIN
         IF NOT EXISTS (SELECT * FROM airplane
@@ -160,7 +160,7 @@ def staff_create_airplane(ID: str, AIRLINE: str, NUM_SEATS: str,
         END
     END;
     '''
-    exec_sql(insert_sql)
+    exec_sql(insert_sql, mysql)
 
     view_sql = f'''
     SELECT *
@@ -171,7 +171,7 @@ def staff_create_airplane(ID: str, AIRLINE: str, NUM_SEATS: str,
     return rtn
 
 # 5.1 add new airport
-def staff_create_airport(NAME: str, CITY: str, COUNTRY: str, TYPE: str) -> None:
+def staff_create_airport(NAME: str, CITY: str, COUNTRY: str, TYPE: str, mysql) -> None:
     sql = f'''
     BEGIN
         IF NOT EXISTS (SELECT * FROM airport WHERE name='{NAME}';)
@@ -181,10 +181,10 @@ def staff_create_airport(NAME: str, CITY: str, COUNTRY: str, TYPE: str) -> None:
         END
     END;
     '''
-    exec_sql(sql)
+    exec_sql(sql, mysql)
 
 # 6.1 view flight average rating
-def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str): #TODO Type?
+def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mysql): #TODO Type?
     sql = f'''
     SELECT avg(rating)
     FROM flight_review join ticket on flight_review.ticket_id = ticket.id
@@ -193,11 +193,11 @@ def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: s
         AND airline = '{AIRLINE}'
         AND dept_datetime = '{DEPT_DATETIME}';
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 6.2 view flight ratings and comments
-def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str) -> list[tuple]:
+def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT rating, comment
     FROM flight_review join ticket on flight_review.ticket_id = ticket.id
@@ -205,12 +205,12 @@ def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: s
         AND airline = '{AIRLINE}'
         AND dept_datetime = '{DEPT_DATETIME}';
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 7.1 return most frequent customer (fc) within a date range
 # DO NOT CALL !!!
-def staff_view_frequent_customer_range(START: str, END: str) -> list[tuple]:
+def staff_view_frequent_customer_range(START: str, END: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT tmp.num as 'num_purchases', c.name, c.email, c.phone_number
     FROM
@@ -224,7 +224,7 @@ def staff_view_frequent_customer_range(START: str, END: str) -> list[tuple]:
     ORDER BY num Desc
     LIMIT 1;
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 7.2 view most frequent customer in the last month
@@ -248,7 +248,7 @@ def staff_view_frequent_customer_year() -> list[tuple]:
     return staff_view_frequent_customer_range(start, end)
 
 # 7.4 view a customer's flight history
-def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str) -> list[tuple]:
+def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT flight_num, airline, dept_datetime
     FROM ticket
@@ -258,7 +258,7 @@ def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str) -> list[tuple]:
         WHERE customer_email='{EMAIL}'
         );
     '''
-    rtn = exec_sql(sql)
+    rtn = exec_sql(sql, mysql)
     return rtn
 
 # 8.1 return the total number of tickets sold based on a range of dates

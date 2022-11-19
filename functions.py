@@ -2,6 +2,7 @@ import hashlib
 import datetime
 
 
+
 #############################################################
 
 # *******
@@ -29,9 +30,9 @@ def sql_transaction_wrap(sql: str) -> str:
 
 
 # execute a sql statement
-def exec_sql(sql: str) -> list:
+def exec_sql(sql: str, mysql) -> list:
     cur = mysql.connection.cursor()
-    cur.execute(sql_transaction_wrap(str))
+    cur.execute(sql_transaction_wrap(sql))
     return cur.fetchall()
 
 
@@ -60,7 +61,7 @@ def date_in_X_days(NUM_DAYS: int) -> str:
 # ******
 
 # check if a staff's log in credentials exists
-def query_staff_credentials(USERNAME: str, PASSWORD: str) -> list:
+def query_staff_credentials(USERNAME: str, PASSWORD: str, mysql) -> list:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
     sql = f'''
         SELECT *
@@ -68,11 +69,12 @@ def query_staff_credentials(USERNAME: str, PASSWORD: str) -> list:
         WHERE username = '{USERNAME}'
             AND password = '{ENCRYPTED_PASSWORD}';
         '''
-    return exec_sql(sql)
+
+    return exec_sql(sql, mysql)
 
 
 # check if a customer's log in credentials exists
-def query_customer_credentials(EMAIL: str, PASSWORD: str) -> list:
+def query_customer_credentials(EMAIL: str, PASSWORD: str, mysql) -> list:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
     sql = f'''
         SELECT *
@@ -80,7 +82,7 @@ def query_customer_credentials(EMAIL: str, PASSWORD: str) -> list:
         WHERE email = '{EMAIL}'
             AND password = '{ENCRYPTED_PASSWORD}';
         '''
-    return exec_sql(sql)
+    return exec_sql(sql, mysql)
 
 
 # ******************
@@ -88,26 +90,26 @@ def query_customer_credentials(EMAIL: str, PASSWORD: str) -> list:
 # ******************
 
 # check if a staff's username exists
-def query_staff_username(USERNAME: str) -> bool:
+def query_staff_username(USERNAME: str, mysql) -> bool:
     sql = f'''
     SELECT *
     FROM airline_staff
     WHERE username = '{USERNAME}';
     '''
-    username_exists = exec_sql(sql)
+    username_exists = exec_sql(sql, mysql)
     if username_exists:
         return True
     return False
 
 
 # check if a staff's employer exists
-def query_staff_employer(EMPLOYER: str) -> bool:
+def query_staff_employer(EMPLOYER: str, mysql) -> bool:
     sql = f'''
     SELECT *
     FROM airline
     WHERE name = '{EMPLOYER}';
     '''
-    employer_exists = exec_sql(sql)
+    employer_exists = exec_sql(sql, mysql)
     if employer_exists:
         return True
     return False
@@ -115,14 +117,14 @@ def query_staff_employer(EMPLOYER: str) -> bool:
 
 # create a staff account
 def create_staff_account(USERNAME: str, PASSWORD: str, FNAME: str,
-                         LNAME: str, DOB: str, EMPLOYER: str) -> None:
+                         LNAME: str, DOB: str, EMPLOYER: str, mysql) -> None:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
     sql = f'''
     INSERT INTO airline_staff
     VALUES ('{USERNAME}','{ENCRYPTED_PASSWORD}','{FNAME}',
         '{LNAME}','{DOB}','{EMPLOYER}');
     '''
-    exec_sql(sql)
+    exec_sql(sql, mysql)
 
 
 # *********************
@@ -130,14 +132,14 @@ def create_staff_account(USERNAME: str, PASSWORD: str, FNAME: str,
 # *********************
 
 # check if a customer's email exists
-def query_customer_email(EMAIL: str) -> bool:
+def query_customer_email(EMAIL: str, mysql) -> bool:
     sql = f'''
     SELECT *
     FROM customer
     WHERE email = '{EMAIL}';
     '''
 
-    account_exists = exec_sql(sql)
+    account_exists = exec_sql(sql, mysql)
     if account_exists:
         return True
     return False
@@ -146,12 +148,12 @@ def query_customer_email(EMAIL: str) -> bool:
 # create a customer account
 def create_customer_account(EMAIL: str, NAME: str, PASSWORD: str, BUILDING_NUM: str, CITY: str, STATE: str,
                             STREET: str, PP_COUNTRY: str, PP_NUM: str, PP_EXPR: str, DOB: str,
-                            PHONE_NUM: str, ) -> None:
+                            PHONE_NUM: str, mysql) -> None:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
     sql = f'''
     INSERT INTO customer
     VALUES ('{EMAIL}','{NAME}','{ENCRYPTED_PASSWORD}','{BUILDING_NUM}','{CITY}','{STATE}',
             '{STREET}','{PP_COUNTRY}','{PP_NUM}','{PP_EXPR}','{DOB}','{PHONE_NUM}');
     '''
-    exec_sql(sql)
+    exec_sql(sql, mysql)
 
