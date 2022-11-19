@@ -13,6 +13,7 @@ import hashlib
 
 # Initialize the app from Flask
 app = Flask(__name__)
+app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
