@@ -1,34 +1,54 @@
-<!DOCTYPE html>
-<html>
+{%extends "base.html"%}
 
-<head>
+{%block content%}
+	<div>
+		{% if not message %}
+			<h1 class="textcenter">Airline Reservation System</h1>	
+			<div class="stack textcenter">
+				<a href="">See Flight Info</a>
+				<a href="/login">Login</a>
+				<a href="/register_staff">Staff Register</a>
+				<a href="/register_customer">Customer Register</a>
+			</div>
+			
+		{% endif %}
 
-</head>
+		{% if is_staff %}
+			<h1 class="textcenter">Airline Reservation System for Staff</h1>	
+			<h2>Welcome,&ensp;{{username}}</h2>
+			<p>What would you like to do?</p>
+			<a href="">View Flights</a>
+			<p class="">Create New Flights</p> 
+			<a href="">Change Status of Flights</a> 
+			<a href="">Add New Airplane</a> 
+			<a href="">Add New Airport</a> 
+			<a href="">View Flight Ratings</a>
+			<a href="">View Frequent Customers</a>
+			<a href="">View Reports</a>
+			<a href="">Earned Revenue</a>
 
-<body>
-{% if not message %}
-	<a href="/login">Login</a>
-	<a href="/register_staff">Staff Register</a>
-    <a href="/register_customer">Customer Register</a>
-{% endif %}
+		{% endif %}
 
-{% if message %}
-	<a href="/logout">Logout</a>
-	<a href="/remove_account">Remove Account</a>
-	<p class="message">You are logged in {{message}}. You have {{num}} follower(s)</p> </br>
-	<a href="/tweets">View your tweets</a> </br>
-	<a href="/find_people">Find people to follow</a> </br>
-	<a href="/unfollow">Unfollow someone</a> </br>
-	<a href="/view_followed">View people you have followed</a> </br>
-	</br>
+		{% if is_customer %}
+			<h1 class="textcenter">Airline Reservation System for Customers</h1>	
+			<h2>Welcome,&ensp;{{username}}</h2>
+			<p>What would you like to do?</p>
+			<div class="stack textcenter">
+				
+			
+				<a href="">View My Flights</a>
+				
+				<a href="">Search for Flights</a> 
+				<a href="">Purchase Tickets</a>
+				<a href="">Cancel Trip</a> 
+				<a href="">Rate/Comment on Previous Flights</a> 
+				<a href="">Track my Spending</a> 
+				<a href="">Logout</a>
+			</div>
+			
+		{% endif %}
+	</div>
 
-        <h4>15 most recent tweets from you and your followers </h4> </br>
+{%endblock%}
 
-	{% for line in tweets%}
-	        <p>{{line}}</p>
-	        <hr>
-	{% endfor %}
-	{% endif %}
-</body>
 
-</html>

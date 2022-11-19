@@ -1,19 +1,21 @@
-<html>
-<head>
-</head>
-<body>
-<form action="/loginAuth" method="POST">
-	<input type="text" name = "username" placeholder="username or email" required/> </br>
-	<input type="password" name = "password" placeholder="password" required/></br>
-	<input type="submit" value = Login />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
-</form>
+{%extends "base.html"%}
 
-<a href="/">Go back</a>
+{%block content%}
+	<div class="textcenter">
+		<h1>Airline Reservation System Login</h1>
+		<form class="cinput" action="/loginAuth" method="POST">
+			<input type="text" name = "username" placeholder="username or email" required/>
+			<input type="password" name = "password" placeholder="password" required/>
+			<input type="submit" value = Login />
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+		</form>
 
-</body>
+		<a href="/">Go back</a>
+	</div>
+	
+
+{%endblock%}
 
 
-</html>
