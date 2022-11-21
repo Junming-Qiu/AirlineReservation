@@ -33,7 +33,6 @@ with app.app_context():
     curs = mysql.connection.cursor()
 
 
-
 # Define a route to hello function
 @app.route('/')
 def hello():
@@ -42,7 +41,30 @@ def hello():
 # Define route for login
 @app.route('/login')
 def login():
+    username_or_email = ""
+    key = ""
+
+    if "username" in session:
+        username_or_email = session["username"]
+    if "key" in session:
+        key = session["key"]
+
+    if username_or_email in customer_tokens:
+        if customer_tokens[username_or_email] == key:
+            return redirect(url_for("customer"))
+
+    if username_or_email in staff_tokens:
+        if staff_tokens[username_or_email] == key:
+            return redirect(url_for("staff"))
+        
+
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session["username"] = ""
+    session["key"] = ""
+    return redirect(url_for("login"))
 
 # Define route for staff register
 @app.route('/register_staff')
@@ -118,14 +140,28 @@ def loginAuth():
 
     if is_staff:
         session['username'] = username_or_email
-        return render_template('staff.html', is_staff = is_staff!=False) #TODO: CHANGE TO STAFF HOMEPAGE
-
-    if is_customer:
+        session['key'] = encrypt_password(username_or_email)
+        staff_tokens[username_or_email] = session["key"]
+        return redirect(url_for("staff"))
+        
+    if is_customer:     
         session['username'] = username_or_email
-        return render_template('customer.html', is_customer = is_customer!=False) #TODO: CHANGE TO CUSTOMER HOMEPAGE
+        session['key'] = encrypt_password(username_or_email)
+        customer_tokens[username_or_email] = session["key"]
+        return redirect(url_for("customer"))
 
     error = 'Log in credentials are incorrect'
     return render_template('login.html', error=error)
+
+
+@app.route("/staff")
+def staff():
+    return render_template('staff.html', is_staff = True) #TODO: CHANGE TO STAFF HOMEPAGE
+
+
+@app.route("/customer")
+def customer():
+    return render_template('customer.html', is_customer = True) #TODO: CHANGE TO CUSTOMER HOMEPAGE
 
 
 #
