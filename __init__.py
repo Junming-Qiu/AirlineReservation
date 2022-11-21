@@ -79,18 +79,18 @@ def registerAuthStaff():
     employer = request.form['employer']
 
     # check if username exists
-    if query_staff_username(username):
+    if query_staff_username(username, mysql):
         error = f'Account with username {username} already exists'
         return render_template('register staff.html', error=error)
 
     # check if employer does not exist
-    if not query_staff_employer(employer):
+    if not query_staff_employer(employer, mysql):
         error = f'Airline {employer} does not exist'
         return render_template('register staff.html', error=error)
 
     # create account
     create_staff_account(username, password, fname,
-                         lname, dob, employer)
+                         lname, dob, employer, mysql)
     # render homepage
     return render_template('index.html') #TODO: change to homepage
 
@@ -111,7 +111,7 @@ def registerAuthCustomer():
     phone_num = request.form['phone_num']
 
     # check if email exists
-    if query_customer_email(email):
+    if query_customer_email(email, mysql):
         error = f'Account with email {email} already exists'
         return render_template('register customer.html', error=error)
 

@@ -33,6 +33,7 @@ def sql_transaction_wrap(sql: str) -> str:
 def exec_sql(sql: str, mysql) -> list:
     cur = mysql.connection.cursor()
     cur.execute(sql_transaction_wrap(sql))
+    mysql.connection.commit()
     return cur.fetchall()
 
 
