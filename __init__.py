@@ -23,7 +23,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '***' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'Potatooo123!' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 3306
 
@@ -41,21 +41,13 @@ def hello():
 # Define route for login
 @app.route('/login')
 def login():
-    username_or_email = ""
-    key = ""
+    c_logged, s_logged = store_verify(session, customer_tokens, staff_tokens)
 
-    if "username" in session:
-        username_or_email = session["username"]
-    if "key" in session:
-        key = session["key"]
+    if c_logged:
+        return redirect(url_for("customer"))
 
-    if username_or_email in customer_tokens:
-        if customer_tokens[username_or_email] == key:
-            return redirect(url_for("customer"))
-
-    if username_or_email in staff_tokens:
-        if staff_tokens[username_or_email] == key:
-            return redirect(url_for("staff"))
+    if s_logged:
+        return redirect(url_for("staff"))
         
 
     return render_template('login.html')
@@ -156,12 +148,18 @@ def loginAuth():
 
 @app.route("/staff")
 def staff():
-    return render_template('staff.html', is_staff = True) #TODO: CHANGE TO STAFF HOMEPAGE
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        return render_template('staff.html', is_staff = True) #TODO: CHANGE TO STAFF HOMEPAGE
+    return redirect(url_for("login"))
 
 
 @app.route("/customer")
 def customer():
-    return render_template('customer.html', is_customer = True) #TODO: CHANGE TO CUSTOMER HOMEPAGE
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        return render_template('customer.html', is_customer = True) #TODO: CHANGE TO CUSTOMER HOMEPAGE
+    return redirect(url_for("login"))
 
 
 #
