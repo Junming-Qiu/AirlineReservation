@@ -1,5 +1,5 @@
 from functions import *
-
+from flask_mysqldb import MySQL
 # ****************
 # STAFF USE CASES
 # ****************
@@ -186,12 +186,12 @@ def staff_create_airport(NAME: str, CITY: str, COUNTRY: str, TYPE: str, mysql) -
 # 6.1 view flight average rating
 def staff_view_flight_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mysql): #TODO Type?
     sql = f'''
-    SELECT avg(rating)
-    FROM flight_review join ticket on flight_review.ticket_id = ticket.id
-    GROUP BY flight_num, airline, dept_datetime
-    HAVING flight_num = '{FLIGHT_NUM}'
-        AND airline = '{AIRLINE}'
-        AND dept_datetime = '{DEPT_DATETIME}';
+    SELECT avg(f.rating)
+    FROM flight_review as f join ticket as t on f.ticket_id = t.id
+    GROUP BY t.flight_num, t.airline, t.dept_datetime
+    HAVING t.flight_num = '{FLIGHT_NUM}'
+        AND t.airline = '{AIRLINE}'
+        AND t.dept_datetime = '{DEPT_DATETIME}';
     '''
     rtn = exec_sql(sql, mysql)
     return rtn
@@ -248,7 +248,7 @@ def staff_view_frequent_customer_year() -> list[tuple]:
     return staff_view_frequent_customer_range(start, end)
 
 # 7.4 view a customer's flight history
-def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql) -> list[tuple]:
+def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql: MySQL) -> list[tuple]:
     sql = f'''
     SELECT flight_num, airline, dept_datetime
     FROM ticket
@@ -262,15 +262,64 @@ def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql) -> list[
     return rtn
 
 # 8.1 return the total number of tickets sold based on a range of dates
+def staff_view_tickets_sold_range(START: str, END: str, AIRLINE: str, mysql: MySQL) -> list[tuple]:
+    sql = f'''
+    SELECT count(*) as ticket_sold
+    FROM ticket as t JOIN purchase as p ON t.id=p.ticket_id
+    WHERE t.airline='{AIRLINE}'
+        AND p.purchase_datetime BETWEEN {START} AND {END}
+    '''
+    rtn = exec_sql(sql, mysql)
+    return rtn
 
 # 8.2 return the total number of tickets sold in the last month
+def staff_view_tickets_sold_month(AIRLINE: str, mysql: MySQL) -> list[tuple]:
+    first = str(datetime.today().date().replace(day=1))
+    month_start = first[0:4] + first[5:7] + first[8:10]
+
+    today = str(datetime.date.today())
+    end = today[0:4] + today[5:7] + today[8:10]
+
+    return staff_view_tickets_sold_range(month_start, end, AIRLINE)
 
 # 8.3 return the total number of tickets sold in the last year
+def staff_view_tickets_sold_year(AIRLINE: str, mysql: MySQL) -> list[tuple]:
+    first = str(datetime.today().date().replace(day=1, month=1))
+    year_start = first[0:4] + first[5:7] + first[8:10]
+
+    today = str(datetime.date.today())
+    end = today[0:4] + today[5:7] + today[8:10]
+
+    return staff_view_tickets_sold_range(year_start, end, AIRLINE)
 
 # 9.1 return the total number of revenue based on a range of dates
+def staff_view_revenue_range(START: str, END: str, AIRLINE: str, mysql: MySQL) -> list[tuple]:
+    sql = f'''
+    SELECT sum(p.sold_price) as revenue
+    FROM ticket as t JOIN purchase as p ON t.id=p.ticket_id
+    WHERE t.airline='{AIRLINE}'
+        AND p.purchase_datetime BETWEEN {START} AND {END}
+    '''
+    rtn = exec_sql(sql, mysql)
+    return rtn
 
 # 9.2 return the total amount of revenue in the last month
+def staff_view_revenue_month(AIRLINE: str, mysql: MySQL) -> list[tuple]:
+    first = str(datetime.today().date().replace(day=1))
+    month_start = first[0:4] + first[5:7] + first[8:10]
+
+    today = str(datetime.date.today())
+    end = today[0:4] + today[5:7] + today[8:10]
+
+    return staff_view_revenue_range(month_start, end, AIRLINE, mysql)
 
 # 9.3 return the total amount of revenue in the last year
+def staff_view_revenue_year(AIRLINE: str, mysql: MySQL) -> list[tuple]:
+    first = str(datetime.today().date().replace(day=1, month=1))
+    year_start = first[0:4] + first[5:7] + first[8:10]
 
+    today = str(datetime.date.today())
+    end = today[0:4] + today[5:7] + today[8:10]
+
+    return staff_view_revenue_range(year_start, end, AIRLINE)
 # TODO: 10 LogOut
