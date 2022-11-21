@@ -140,13 +140,13 @@ def loginAuth():
 
     if is_staff:
         session['username'] = username_or_email
-        session['key'] = encrypt_password(username_or_email)
+        session['key'] = encrypt_password(username_or_email+password)
         staff_tokens[username_or_email] = session["key"]
         return redirect(url_for("staff"))
         
     if is_customer:     
         session['username'] = username_or_email
-        session['key'] = encrypt_password(username_or_email)
+        session['key'] = encrypt_password(username_or_email+password)
         customer_tokens[username_or_email] = session["key"]
         return redirect(url_for("customer"))
 
