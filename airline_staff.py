@@ -156,20 +156,11 @@ def staff_create_flight(FNUM: str, AIRLINE: str, AIRPLANE_ID: str,
 def staff_update_flight_status(FNUM: str, AIRLINE: str,
                                  DEPT_DT: str, STATUS: str, mysql) -> None:
     sql =f'''
-    BEGIN
-        IF EXISTS (SELECT * 
-                    FROM flight 
-                    WHERE flight_num='{FNUM}'
-                        AND airline='{AIRLINE}'
-                        AND dept_datetime={DEPT_DT};)
-        BEGIN
-            UPDATE flight 
-            SET flight_status='{STATUS}' 
-            WHERE flight_num='{FNUM}'
-                AND airline='{AIRLINE}'
-                AND dept_datetime={DEPT_DT};
-        END
-    END;
+        UPDATE flight 
+        SET flight_status='{STATUS}' 
+        WHERE flight_num='{FNUM}'
+            AND airline='{AIRLINE}'
+            AND dept_datetime={DEPT_DT};
     '''
     exec_sql(sql, mysql)
 
@@ -178,14 +169,8 @@ def staff_update_flight_status(FNUM: str, AIRLINE: str,
 def staff_create_airplane(ID: str, AIRLINE: str, NUM_SEATS: str,
                           AGE: str, MANUFACTURER: str, mysql) -> list[tuple]:
     insert_sql = f'''
-    BEGIN
-        IF NOT EXISTS (SELECT * FROM airplane
-                    WHERE id='{ID}' AND airline='{AIRLINE}';)
-        BEGIN
-            INSERT INTO airplane
-            VALUES ('{ID}', '{AIRLINE}', {NUM_SEATS}, {AGE},'{MANUFACTURER}')
-        END
-    END;
+    INSERT INTO airplane
+    VALUES ('{ID}', '{AIRLINE}', {NUM_SEATS}, {AGE},'{MANUFACTURER}');
     '''
     exec_sql(insert_sql, mysql)
 
@@ -200,13 +185,8 @@ def staff_create_airplane(ID: str, AIRLINE: str, NUM_SEATS: str,
 # 5.1 add new airport
 def staff_create_airport(NAME: str, CITY: str, COUNTRY: str, TYPE: str, mysql) -> None:
     sql = f'''
-    BEGIN
-        IF NOT EXISTS (SELECT * FROM airport WHERE name='{NAME}';)
-        BEGIN
-            INSERT INTO airport
-            VALUES ('{NAME}', '{CITY}', '{COUNTRY}', '{TYPE}')
-        END
-    END;
+    INSERT INTO airport
+    VALUES ('{NAME}', '{CITY}', '{COUNTRY}', '{TYPE}');
     '''
     exec_sql(sql, mysql)
 

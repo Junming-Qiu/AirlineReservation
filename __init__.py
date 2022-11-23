@@ -21,9 +21,9 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '***' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'walrus123' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
-app.config['MYSQL_PORT'] = 3306
+app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 
 mysql = MySQL(app)
 
