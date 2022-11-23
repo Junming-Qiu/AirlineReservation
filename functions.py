@@ -180,3 +180,27 @@ def create_customer_account(EMAIL: str, NAME: str, PASSWORD: str, BUILDING_NUM: 
     '''
     exec_sql(sql, mysql)
 
+
+# Takes many works and checks that they are valid as a group
+def parse_input(inputs: list[str], ispass=False) -> bool:
+    print("parsing", inputs, ispass)
+    alpha_lower = "abcdefghijklmnopqrstuvwxyz"
+    alpha_upper = alpha_lower.capitalize()
+    nums = "0123456789"
+    restrict = ['\0', '\'', '\"', '\b', '\n', '\r', '\t', '\Z', '\\', '\%', '\_', \
+        '?', '-', '(', ')', '{', '}', '[', ']']
+
+    for word in inputs:
+        if ispass:
+            print("password", ' ' in word)
+            if ' ' in word:
+                return False
+
+            if len(word) <= 8:
+                return False
+
+        for c in word:
+            if c not in alpha_lower and c not in alpha_upper and c not in nums and c in restrict:
+                return False
+
+    return True

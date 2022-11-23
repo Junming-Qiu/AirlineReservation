@@ -23,6 +23,15 @@
     gap:5px;
 }
 
-/* body{
-    background-color: cornflowerblue;
-} */
+.row{
+    display: flex;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+
+td{
+    border: solid 1px black;
+}

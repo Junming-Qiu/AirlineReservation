@@ -15,19 +15,42 @@ from flask_mysqldb import MySQL
 
 
 # 1.1 view flight based on next 30 days
-def staff_view_flight_30_days(AIRLINE: str, mysql) -> list[tuple]:
-    today = date_in_X_days(0)
-    plus30 = date_in_X_days(30)
-    sql = F'''
-    SELECT *
-    FROM flights
-    WHERE airline = '{AIRLINE}'
-        AND dept_datetime BETWEEN {today} AND {plus30};
+def staff_view_flight_all(AIRLINE: str, before, after, source, destination, s_city, d_city, mysql) -> list[tuple]:
+    if not before:
+        before = date_in_X_days(0)
+
+    if not after:
+        after = date_in_X_days(30)
+
+    sql = f'''
+        SELECT f.flight_num, f.airline, f.airplane_id,
+        f.arrv_datetime, f.dept_datetime, f.base_price,
+        f.origin, f.destination, f.flight_status
+        FROM flight as f JOIN airport as a ON f.origin=a.name JOIN airport as b ON f.destination=b.name
+        WHERE f.airline = '{AIRLINE}'
     '''
+
+    if before and after:
+        sql += f" AND f.dept_datetime BETWEEN {before} AND {after}"
+    
+    if source:
+        sql += f" AND f.origin = '{source}'"
+
+    if destination:
+        sql += f" AND f.destination = '{destination}'"
+
+    if s_city:
+        sql += f" AND a.city = '{s_city}'"
+
+    if d_city:
+        sql += f" AND b.city = '{d_city}'"
+
+    sql += ";"
+    print(sql)
     rtn = exec_sql(sql, mysql)
     return rtn
 
-# 1.2 view flight based on airline
+# 1.2 view flight based on airline (combined)
 def staff_view_flight_airline(AIRLINE: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
@@ -37,7 +60,7 @@ def staff_view_flight_airline(AIRLINE: str, mysql) -> list[tuple]:
     rtn = exec_sql(sql, mysql)
     return rtn
 
-# 1.3 view flight based on a range of dates
+# 1.3 view flight based on a range of dates (combined)
 def staff_view_flight_date_range(START: str, END: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
@@ -47,7 +70,7 @@ def staff_view_flight_date_range(START: str, END: str, mysql) -> list[tuple]:
     rtn = exec_sql(sql, mysql)
     return rtn
 
-# 1.4 view flight based on airport source
+# 1.4 view flight based on airport source (combined)
 def staff_view_flight_airport_origin(ORIGIN: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
@@ -57,7 +80,7 @@ def staff_view_flight_airport_origin(ORIGIN: str, mysql) -> list[tuple]:
     rtn = exec_sql(sql, mysql)
     return rtn
 
-# 1.5 view flight based on airport destination
+# 1.5 view flight based on airport destination (combined)
 def staff_view_flight_airport_dest(DESTINATION: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT *
@@ -67,7 +90,7 @@ def staff_view_flight_airport_dest(DESTINATION: str, mysql) -> list[tuple]:
     rtn = exec_sql(sql, mysql)
     return rtn
 
-# 1.6 view flight based on city origin
+# 1.6 view flight based on city origin (combined)
 def staff_view_flight_city_origin(CITY: str, mysql) -> list[tuple]:
     sql = f''' 
     SELECT f.flight_num, f.airline, f.airplane_id,
@@ -79,7 +102,7 @@ def staff_view_flight_city_origin(CITY: str, mysql) -> list[tuple]:
     rtn = exec_sql(sql, mysql)
     return rtn
 
-# 1.7 view flight based on city destination
+# 1.7 view flight based on city destination (combined)
 def staff_view_flight_city_destination(CITY: str, mysql) -> list[tuple]:
     sql = f''' 
     SELECT f.flight_num, f.airline, f.airplane_id,
@@ -92,7 +115,7 @@ def staff_view_flight_city_destination(CITY: str, mysql) -> list[tuple]:
     return rtn
 
 # 1.8 view customers on a flight
-def staff_view_flight_passangers(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -> list[tuple]:
+def staff_view_flight_passengers(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -> list[tuple]:
     sql = f'''
     SELECT c.name, c.email, c.phone_number
     FROM customer as c, purchase as p, ticket as t
@@ -102,6 +125,7 @@ def staff_view_flight_passangers(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -
         AND t.airline = '{AIRLINE}'
         AND t.dept_datetime = {DEPT_DT};
     '''
+
     rtn = exec_sql(sql, mysql)
     return rtn
 
@@ -123,6 +147,9 @@ def staff_create_flight(FNUM: str, AIRLINE: str, AIRPLANE_ID: str,
         END
     END;
     '''
+
+    print(sql)
+
     exec_sql(sql, mysql)
 
 # 3.1 change flight status
@@ -322,4 +349,5 @@ def staff_view_revenue_year(AIRLINE: str, mysql: MySQL) -> list[tuple]:
     end = today[0:4] + today[5:7] + today[8:10]
 
     return staff_view_revenue_range(year_start, end, AIRLINE)
+
 # TODO: 10 LogOut

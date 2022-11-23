@@ -6,6 +6,7 @@ import sys
 sys.path.insert(0, os.getcwd())
 
 from functions import *
+from airline_staff import *
 global customer_tokens
 global staff_tokens
 
@@ -13,9 +14,6 @@ customer_tokens = {}
 staff_tokens = {}
 # TODO LIST
 # 3. get seperate files working together
-
-
-
 
 # Initialize the app from Flask
 app = Flask(__name__)
@@ -71,12 +69,35 @@ def register_customer():
 # Authenticates the register
 @app.route('/registerAuthStaff', methods=['GET', 'POST'])
 def registerAuthStaff():
-    username = request.form['username']
-    password = request.form['password']
-    fname = request.form['fname']
-    lname = request.form['lname']
-    dob = request.form['dob']
-    employer = request.form['employer']
+    username = ""
+    password = ""
+    fname = ""
+    lname = ""
+    dob = ""
+    employer = ""
+
+    #Check all input is there
+    try:
+        username = request.form['username']
+        password = request.form['password']
+        fname = request.form['fname']
+        lname = request.form['lname']
+        dob = request.form['dob']
+        employer = request.form['employer']
+
+    except:
+        error = "Input Missing"
+        return render_template('register staff.html', error=error)
+       
+    #Parse input for security
+    if not parse_input([password], True):
+        error = "Username or Password Error. Password may not contain space or '\Z', '\\', '\%', '\_', \
+        '?', '-', '(', ')', '{', '}', '[', ']', and must be 8 characters or more"
+        return render_template('register staff.html', error=error)
+
+    if not parse_input([username, fname, lname, dob, employer]):
+        error = "Input Error"
+        return render_template('register staff.html', error=error)
 
     # check if username exists
     if query_staff_username(username, mysql):
@@ -97,18 +118,46 @@ def registerAuthStaff():
 
 @app.route('/registerAuthCustomer', methods=['GET', 'POST'])
 def registerAuthCustomer():
-    email = request.form['email']
-    name = request.form['name']
-    password = request.form['password']
-    building_num = request.form['building_num']
-    city = request.form['city']
-    state = request.form['state']
-    street = request.form['street']
-    pp_country = request.form['pp_country']
-    pp_num = request.form['pp_num']
-    pp_expr = request.form['pp_expr']
-    dob = request.form['dob']
-    phone_num = request.form['phone_num']
+    email = ""
+    name = ""
+    password = ""
+    building_num = ""
+    city = ""
+    state = ""
+    street = ""
+    pp_country = ""
+    pp_num = ""
+    pp_expr = ""
+    dob = ""
+    phone_num = ""
+
+    # Make sure all input is there
+    try:
+        email = request.form['email']
+        name = request.form['name']
+        password = request.form['password']
+        building_num = request.form['building_num']
+        city = request.form['city']
+        state = request.form['state']
+        street = request.form['street']
+        pp_country = request.form['pp_country']
+        pp_num = request.form['pp_num']
+        pp_expr = request.form['pp_expr']
+        dob = request.form['dob']
+        phone_num = request.form['phone_num']
+    except:
+        error = "Input Missing"
+        return render_template('register customer.html', error=error)        
+
+    # Parse input for security
+    if not parse_input([password], True):
+        error = "Username or Password Error. Password may not contain space or '\Z', '\\', '\%', '\_', \
+        '?', '-', '(', ')', '{', '}', '[', ']', and must be 8 characters or more"
+        return render_template('register customer.html', error=error)
+
+    if not parse_input([email, name, building_num, city, state, street, pp_country, pp_num, pp_expr, dob, phone_num]):
+        error = "Input Error"
+        return render_template('register customer.html', error=error)
 
     # check if email exists
     if query_customer_email(email, mysql):
@@ -117,16 +166,26 @@ def registerAuthCustomer():
 
     # create account
     create_customer_account(email,name,password,building_num,city,state,
-                            street,pp_country,pp_num,pp_expr,dob,phone_num)
+                            street,pp_country,pp_num,pp_expr,dob,phone_num, mysql)
 
     # render homepage
     return render_template('index.html') #TODO: change to homepage
 
 @app.route('/loginAuth', methods=['POST', 'GET'])
 def loginAuth():
-    username_or_email = request.form['username']
-    password = request.form['password']
-  
+    try:
+        username_or_email = request.form['username']
+        password = request.form['password']
+    except:
+        return redirect(url_for("login"))
+    
+    # Parse input for security
+    if not parse_input([username_or_email]):
+        return redirect(url_for("login"))
+
+    if not parse_input([password], True):
+        return redirect(url_for("login"))
+
     is_staff = query_staff_credentials(username_or_email, password, mysql)
     is_customer = query_customer_credentials(username_or_email, password, mysql)
 
@@ -150,15 +209,141 @@ def loginAuth():
 def staff():
     _, s_logged = store_verify(session, customer_tokens, staff_tokens)
     if s_logged:
-        return render_template('staff.html', is_staff = True) #TODO: CHANGE TO STAFF HOMEPAGE
+        return render_template('staff.html', is_staff = True, username=session["username"]) #TODO: CHANGE TO STAFF HOMEPAGE
     return redirect(url_for("login"))
 
+@app.route("/staff_view_flights", methods=['GET', 'POST'])
+def staff_view_flights():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+
+        before = ""
+        after = ""
+        source = ""
+        destination = ""
+        s_city = ""
+        d_city = ""
+        flights = []
+
+        try:
+            before = request.form['before']
+            after = request.form['after']
+            source = request.form['source']
+            destination = request.form['destination']
+            s_city = request.form['s_city']
+            d_city = request.form['d_city']
+
+        # Allow some inputs to be missing
+        except:
+            pass
+
+        # Input security
+        if not parse_input([before, after, source, destination, s_city, d_city]):
+            return render_template('staff_view_flights.html', flights=flights)
+
+        airline = f'''
+        SELECT employer 
+        FROM airline_staff
+        WHERE username = '{session['username']}';'''
+
+        airline = exec_sql(airline, mysql)[0][0]
+
+        flights = staff_view_flight_all(airline, before, after, source, destination, s_city, d_city, mysql)
+
+        return render_template('staff_view_flights.html', flights=flights)
+
+    return redirect(url_for("login"))
+
+@app.route("/staff_view_flights_customer/<string:flight_number>/<string:airline>/<string:dept_dt>")
+def staff_view_flights_customer(flight_number, airline, dept_dt):
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        dept_dt = "".join(dept_dt.split(" ")[0].split("-"))
+
+        customers = staff_view_flight_passengers(flight_number, airline, dept_dt, mysql)
+
+        if len(customers) > 0:
+            result = True
+        else:
+            result = False
+
+        return render_template('staff_view_flights_customers.html', customers=customers, flight_number=flight_number, result=result)
+
+    return redirect(url_for("login"))
+
+@app.route("/staff_create_flight")
+def staff_create_flight_view():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        airline = f'''
+        SELECT employer
+        FROM airline_staff
+        WHERE username = '{session['username']}';
+        '''
+
+        airline = exec_sql(airline, mysql)[0][0]
+
+        airline_choices = f'''
+        SELECT id
+        FROM airplane
+        WHERE airline = '{airline}';
+        '''
+
+        airline_choices = exec_sql(airline_choices, mysql)
+
+        return render_template("staff_create_flight.html", airline=airline, planes=airline_choices)
+
+    return redirect(url_for("login"))
+
+@app.route('/staff_create_flight_submit', methods=["POST", "GET"])
+def staff_create_flight_submit():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        flight_num = ""
+        dept_time = ""
+        arr_time = ""
+        source = ""
+        destination = ""
+        base_price = ""
+        airplane_id = ""
+        status = ""
+
+        airline = f'''
+        SELECT employer
+        FROM airline_staff
+        WHERE username = '{session['username']}';
+        '''
+
+        airline = exec_sql(airline, mysql)[0][0]
+
+        try:
+            flight_num = request.form['flight_num']
+            dept_time = request.form['dept_time']
+            arr_time = request.form['arr_time']
+            source = request.form['source']
+            destination = request.form['destination']
+            base_price = request.form['base_price']
+            airplane_id = request.form['airplane_id']
+            status = request.form['status']
+        except:
+            return redirect(url_for('staff_create_flight'))
+
+        if not parse_input([flight_num, dept_time, arr_time, source, destination, base_price, airplane_id, status]):
+            return redirect(url_for('staff_create_flight'))
+
+        staff_create_flight(flight_num, airline, airplane_id, arr_time, dept_time, base_price, source, destination, status, mysql)
+
+        return render_template("success.html", title='Airline Staff Add Flight', \
+            message=f'Flight {flight_num} ({airplane_id}) departing at {dept_time} from {source} and arriving at {arr_time} in {destination} with price {base_price} and status {status}',\
+                next='/staff')
+
+    return redirect(url_for("login"))
 
 @app.route("/customer")
 def customer():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
     if c_logged:
-        return render_template('customer.html', is_customer = True) #TODO: CHANGE TO CUSTOMER HOMEPAGE
+        return render_template('customer.html', is_customer = True, username=session["username"]) #TODO: CHANGE TO CUSTOMER HOMEPAGE
     return redirect(url_for("login"))
 
 
