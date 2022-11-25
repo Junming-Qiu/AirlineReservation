@@ -180,11 +180,9 @@ def loginAuth():
     
     # Parse input for security
     if not parse_input([username_or_email]):
-        print('HERE')
         return redirect(url_for("login"))
 
     if not parse_input([password], True):
-        print('THERE')
         return redirect(url_for("login"))
 
 
@@ -207,11 +205,56 @@ def loginAuth():
     return render_template('login.html', error=error)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route("/staff")
 def staff():
     _, s_logged = store_verify(session, customer_tokens, staff_tokens)
     if s_logged:
-        return render_template('staff.html', is_staff = True, username=session["username"]) #TODO: CHANGE TO STAFF HOMEPAGE
+        return render_template('staff home.html') #TODO: CHANGE TO STAFF HOMEPAGE
     return redirect(url_for("login"))
 
 @app.route("/staff_view_flights", methods=['GET', 'POST'])
@@ -345,7 +388,7 @@ def staff_create_flight_submit():
 def customer():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
     if c_logged:
-        return render_template('customer.html', is_customer = True, username=session["username"]) #TODO: CHANGE TO CUSTOMER HOMEPAGE
+        return render_template('customer home.html') #TODO: CHANGE TO CUSTOMER HOMEPAGE
     return redirect(url_for("login"))
 
 

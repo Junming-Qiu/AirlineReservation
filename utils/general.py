@@ -33,10 +33,11 @@ def sql_transaction_wrap(sql: str) -> str:
 
 
 # execute a sql statement
-def exec_sql(sql: str, mysql) -> list:
+def exec_sql(sql: str, mysql, commit=False) -> list:
     cur = mysql.connection.cursor()
-    cur.execute(sql_transaction_wrap(sql))
-    mysql.connection.commit()
+    cur.execute(sql)
+    if commit:
+        mysql.connection.commit()
     return cur.fetchall()
 
 
@@ -89,7 +90,7 @@ def store_verify(session, customer_tokens, staff_tokens):
 # check if a staff's log in credentials exists
 def query_staff_credentials(USERNAME: str, PASSWORD: str, mysql) -> list:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
-    print(f'MySQL: Query Staff Password {ENCRYPTED_PASSWORD}')
+    #print(f'MySQL: Query Staff {USERNAME} {ENCRYPTED_PASSWORD}')
     sql = f'''
         SELECT *
         FROM airline_staff
@@ -150,7 +151,7 @@ def create_staff_account(USERNAME: str, PASSWORD: str, FNAME: str,
     VALUES ('{USERNAME}','{ENCRYPTED_PASSWORD}','{FNAME}',
         '{LNAME}','{DOB}','{EMPLOYER}');
     '''
-    exec_sql(sql, mysql)
+    exec_sql(sql, mysql, commit=True)
 
 
 # *********************
@@ -181,7 +182,7 @@ def create_customer_account(EMAIL: str, NAME: str, PASSWORD: str, BUILDING_NUM: 
     VALUES ('{EMAIL}','{NAME}','{ENCRYPTED_PASSWORD}','{BUILDING_NUM}','{CITY}','{STATE}',
             '{STREET}','{PP_COUNTRY}','{PP_NUM}','{PP_EXPR}','{DOB}','{PHONE_NUM}');
     '''
-    exec_sql(sql, mysql)
+    exec_sql(sql, mysql, commit=True)
 
 
 # Takes many works and checks that they are valid as a group

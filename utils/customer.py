@@ -4,13 +4,6 @@ import string
 
 
 
-
-
-
-# TODO: Refactor Airline Staff, fix datetime stuff
-
-
-
 # USE CASE 1: view purchased flights
 
 # return a joined table containing flights purchased by email (DO NOT CALL)
@@ -28,19 +21,10 @@ def _my_flight_table(EMAIL: str):
     return sql
 
 # view the flights purchased by a customer (optionally, given some filter param)
-def customer_view_my_flights(EMAIL: str,
+def customer_view_my_flights(EMAIL: str, mysql,
                              START_DATE=None, END_DATE=None,
                              AP_ORIGIN=None, AP_DEST=None,
                              CITY_ORIGIN=None, CITY_DEST=None) ->  list[tuple]:
-    '''
-
-
-
-    :return:
-    '''
-
-
-
     sql = f'''
     SELECT f.flight_num, f.airline, f.dept_datetime, f.status {_my_flight_table(EMAIL)} '''
 
@@ -69,8 +53,7 @@ def customer_view_my_flights(EMAIL: str,
         AND ap_dest.name='{CITY_DEST}' '''
 
     sql+=';'
-    print(sql)
-    #return exec_sql(sql, mysql)
+    return exec_sql(sql, mysql)
 
 
 
@@ -192,7 +175,7 @@ def _create_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -> str:
     sql=f'''
     INSERT INTO ticket
     VALUES ('{tid}','{FNUM}','{AIRLINE}',{DEPT_DT});'''
-    exec_sql(sql,mysql)
+    exec_sql(sql,mysql,commit=True)
     return tid
 
 # check if a card number exists (DO NOT CALL)
@@ -216,7 +199,7 @@ def _create_card_info(NUM: str, EXPR: str, NAME: str,
         INSERT INTO card_info
         VALUES ('{NUM}',{EXPR},'{NAME}','{TYPE}');
         '''
-        exec_sql(sql,mysql)
+        exec_sql(sql,mysql,commit=True)
 
 # make a new row in purchase (DO NOT CALL)
 def _create_purchase(EMAIL: str, TID: str, PURCHASE_DT: str, SOLD_PRICE: str,
@@ -226,7 +209,7 @@ def _create_purchase(EMAIL: str, TID: str, PURCHASE_DT: str, SOLD_PRICE: str,
     INSERT INTO purchase
     VALUES ('{EMAIL}','{TID}',{PURCHASE_DT},{SOLD_PRICE},{BASE_PRICE},'{CARD_NUM}');
     '''
-    exec_sql(sql, mysql)
+    exec_sql(sql, mysql, commit=True)
 
 # purchase a ticket of a flight TODO CALL THIS FUNCTION
 def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # flight info
@@ -281,7 +264,7 @@ def customer_cancel_ticket(EMAIL, TID, mysql):
             DELETE FROM ticket
             WHERE id='{TID}';
             '''
-            exec_sql(sql, mysql)
+            exec_sql(sql, mysql, commit=True)
         else:
             raise Exception('Ticket already was cancelled')
     else:
@@ -309,7 +292,7 @@ def customer_create_flight_review(EMAIL, TID, RATING, COMMENT, mysql):
         INSERT INTO flight_rating
         VALUES ('{EMAIL}', '{TID}', {RATING}, '{COMMENT}');
         '''
-        exec_sql(sql, mysql)
+        exec_sql(sql, mysql, commit=True)
     else:
         raise Exception('No available record of flight attendance')
 
