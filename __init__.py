@@ -4,10 +4,9 @@ import os
 import sys
 sys.path.insert(0, os.getcwd())
 
-
-from utils.functions import *
-from utils.airline_staff import *
+from utils.staff import *
 from utils.customer import *
+from utils.general import *
 global customer_tokens
 global staff_tokens
 
@@ -21,7 +20,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '***' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'walrus123' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 

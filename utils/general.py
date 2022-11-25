@@ -197,9 +197,11 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
         if ispass:
             print("password", ' ' in word)
             if ' ' in word:
+                print(f"failed to parse {word}")
                 return False
 
             if len(word) <= 8:
+                print(f"failed to parse {word}")
                 return False
 
         for c in word:

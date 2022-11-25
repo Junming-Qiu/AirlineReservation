@@ -22,7 +22,7 @@ insert into airplane values
     ('fXgM-uGTn-fUkL-VZQX', "JetBlue", 80, "2017-08-21", 'Airbus');
 
 insert into airline_staff values
-    ('kbennit283','5f4dcc3b5aa765d61d8327deb882cf99','kathrine','bennit','1983-03-24','JetBlue');
+    ('kbennit283','305e4f55ce823e111a46a9d500bcb86c','kathrine','bennit','1983-03-24','JetBlue');
 
 insert into staff_email values
     ('kbennit283','kben224@gmail.com');
