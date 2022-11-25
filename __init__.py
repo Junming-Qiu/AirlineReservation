@@ -12,8 +12,7 @@ global staff_tokens
 
 customer_tokens = {}
 staff_tokens = {}
-# TODO LIST
-# 3. get seperate files working together
+#       TODO -> CONSTRAINT: for flight on airplane, # tickets of flight <= # seats of airplane // don't allow customers to overbook flights
 
 # Initialize the app from Flask
 app = Flask(__name__)

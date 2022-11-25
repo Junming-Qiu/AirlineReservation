@@ -12,21 +12,24 @@ from flask_mysqldb import MySQL
 
 # TODO: Wrap SQL statement with Atomic Transaction
 def sql_transaction_wrap(sql: str) -> str:
-    wrap = f'''
+    wrap_tmp = f'''
     USE flight_app;
-
-    START TRANSACTION
-
+    
     {sql}
-
-    if ....
-        COMMIT;
-
-    then ... 
-        ROLLBACK;
     '''
+    #
+    # START TRANSACTION
+    #
+    # {sql}
+    #
+    # if ....
+    #     COMMIT;
+    #
+    # then ...
+    #     ROLLBACK;
+    # '''
 
-    return sql
+    return wrap_tmp
 
 
 # execute a sql statement
@@ -45,7 +48,7 @@ def encrypt_password(password: str) -> str:
 
 def check_datetime_format(DATE: str) -> None:
     try:
-        datetime.datetime.strptime(DATE, '%Y%m%d')
+        datetime.datetime.strptime(DATE, '%Y%m%d %H%M%S')
     except ValueError:
         raise ValueError(f'Incorrect date format {DATE}, must be YYYYMMDD')
 
