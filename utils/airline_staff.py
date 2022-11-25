@@ -1,4 +1,4 @@
-from functions import *
+from utils.functions import *
 from flask_mysqldb import MySQL
 # ****************
 # STAFF USE CASES

@@ -1,12 +1,13 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
-from flask_mysqldb import MySQL
 import os
 import sys
 sys.path.insert(0, os.getcwd())
 
-from functions import *
-from airline_staff import *
+
+from utils.functions import *
+from utils.airline_staff import *
+from utils.customer import *
 global customer_tokens
 global staff_tokens
 
@@ -180,10 +181,13 @@ def loginAuth():
     
     # Parse input for security
     if not parse_input([username_or_email]):
+        print('HERE')
         return redirect(url_for("login"))
 
     if not parse_input([password], True):
+        print('THERE')
         return redirect(url_for("login"))
+
 
     is_staff = query_staff_credentials(username_or_email, password, mysql)
     is_customer = query_customer_credentials(username_or_email, password, mysql)

@@ -1,4 +1,10 @@
 
+
+from utils.functions import *
+
+
+exec_sql()
+
 def select_test() -> str:
     sql = '''
     SELECT *

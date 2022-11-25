@@ -89,13 +89,13 @@ def store_verify(session, customer_tokens, staff_tokens):
 # check if a staff's log in credentials exists
 def query_staff_credentials(USERNAME: str, PASSWORD: str, mysql) -> list:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
+    print(f'MySQL: Query Staff Password {ENCRYPTED_PASSWORD}')
     sql = f'''
         SELECT *
         FROM airline_staff
         WHERE username = '{USERNAME}'
             AND password = '{ENCRYPTED_PASSWORD}';
         '''
-
     return exec_sql(sql, mysql)
 
 
@@ -204,6 +204,6 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
 
         for c in word:
             if c not in alpha_lower and c not in alpha_upper and c not in nums and c in restrict:
+                print(f"failed to parse {word}")
                 return False
-
     return True
