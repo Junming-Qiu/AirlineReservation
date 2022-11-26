@@ -4,9 +4,10 @@ import os
 import sys
 sys.path.insert(0, os.getcwd())
 
-from utils.staff import *
+from utils.staff_old import *
 from utils.customer import *
-from utils.general import *
+from utils.login import *
+from utils.register import *
 global customer_tokens
 global staff_tokens
 
@@ -35,6 +36,10 @@ with app.app_context():
 def hello():
     return render_template('index.html')
 
+
+
+### LOG IN ###
+
 # Define route for login
 @app.route('/login')
 def login():
@@ -55,15 +60,47 @@ def logout():
     session["key"] = ""
     return redirect(url_for("login"))
 
+@app.route('/loginAuth', methods=['POST', 'GET'])
+def loginAuth():
+    try:
+        username_or_email = request.form['username']
+        password = request.form['password']
+    except:
+        return redirect(url_for("login"))
+
+    # Parse input for security
+    if not parse_input([username_or_email]):
+        return redirect(url_for("login"))
+
+    if not parse_input([password], True):
+        return redirect(url_for("login"))
+
+    is_staff = query_staff_credentials(username_or_email, password, mysql)
+    is_customer = query_customer_credentials(username_or_email, password, mysql)
+
+    if is_staff:
+        session['username'] = username_or_email
+        session['key'] = encrypt_password(username_or_email + password)
+        staff_tokens[username_or_email] = session["key"]
+        return redirect(url_for("staff"))
+
+    if is_customer:
+        session['username'] = username_or_email
+        session['key'] = encrypt_password(username_or_email + password)
+        customer_tokens[username_or_email] = session["key"]
+        return redirect(url_for("customer"))
+
+    error = 'Log in credentials are incorrect'
+    return render_template('login.html', error=error)
+
+
+
+### STAFF REGISTER ###
+
 # Define route for staff register
 @app.route('/register_staff')
 def register_staff():
     return render_template('register staff.html')
-
-# Define route for customer register
-@app.route('/register_customer')
-def register_customer():
-    return render_template('register customer.html')
 
 # Authenticates the register
 @app.route('/registerAuthStaff', methods=['GET', 'POST'])
@@ -75,7 +112,7 @@ def registerAuthStaff():
     dob = ""
     employer = ""
 
-    #Check all input is there
+    # Check all input is there
     try:
         username = request.form['username']
         password = request.form['password']
@@ -87,8 +124,8 @@ def registerAuthStaff():
     except:
         error = "Input Missing"
         return render_template('register staff.html', error=error)
-       
-    #Parse input for security
+
+    # Parse input for security
     if not parse_input([password], True):
         error = "Username or Password Error. Password may not contain space or '\Z', '\\', '\%', '\_', \
         '?', '-', '(', ')', '{', '}', '[', ']', and must be 8 characters or more"
@@ -112,9 +149,18 @@ def registerAuthStaff():
     create_staff_account(username, password, fname,
                          lname, dob, employer, mysql)
     # render homepage
-    return render_template('index.html') #TODO: change to homepage
+    return render_template('index.html')  # TODO: change to homepage
 
 
+
+### CUSTOMER REGISTER ###
+
+# Define route for customer register
+@app.route('/register_customer')
+def register_customer():
+    return render_template('register customer.html')
+
+# Authenticates the register
 @app.route('/registerAuthCustomer', methods=['GET', 'POST'])
 def registerAuthCustomer():
     email = ""
@@ -170,39 +216,6 @@ def registerAuthCustomer():
     # render homepage
     return render_template('index.html') #TODO: change to homepage
 
-@app.route('/loginAuth', methods=['POST', 'GET'])
-def loginAuth():
-    try:
-        username_or_email = request.form['username']
-        password = request.form['password']
-    except:
-        return redirect(url_for("login"))
-    
-    # Parse input for security
-    if not parse_input([username_or_email]):
-        return redirect(url_for("login"))
-
-    if not parse_input([password], True):
-        return redirect(url_for("login"))
-
-
-    is_staff = query_staff_credentials(username_or_email, password, mysql)
-    is_customer = query_customer_credentials(username_or_email, password, mysql)
-
-    if is_staff:
-        session['username'] = username_or_email
-        session['key'] = encrypt_password(username_or_email+password)
-        staff_tokens[username_or_email] = session["key"]
-        return redirect(url_for("staff"))
-        
-    if is_customer:     
-        session['username'] = username_or_email
-        session['key'] = encrypt_password(username_or_email+password)
-        customer_tokens[username_or_email] = session["key"]
-        return redirect(url_for("customer"))
-
-    error = 'Log in credentials are incorrect'
-    return render_template('login.html', error=error)
 
 
 
@@ -305,7 +318,7 @@ def staff_view_flights_customer(flight_number, airline, dept_dt):
     if s_logged:
         dept_dt = "".join(dept_dt.split(" ")[0].split("-"))
 
-        customers = staff_view_flight_passengers(flight_number, airline, dept_dt, mysql)
+        headings, data = staff_view_flight_passengers(flight_number, airline, dept_dt, mysql)
 
         if len(customers) > 0:
             result = True

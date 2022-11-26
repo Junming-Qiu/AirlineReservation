@@ -1,44 +1,32 @@
 import hashlib
 import datetime
-from flask_mysqldb import MySQL
+
+'''
+
+General purpose functions.
 
 
-#############################################################
-
-# *******
-# GENERAL
-# *******
 
 
-# TODO: Wrap SQL statement with Atomic Transaction
-def sql_transaction_wrap(sql: str) -> str:
-    wrap_tmp = f'''
-    USE flight_app;
-    
-    {sql}
-    '''
-    #
-    # START TRANSACTION
-    #
-    # {sql}
-    #
-    # if ....
-    #     COMMIT;
-    #
-    # then ...
-    #     ROLLBACK;
-    # '''
 
-    return wrap_tmp
+'''
+
+# DO NOT CALL OUTSIDE exec_sql()
+def _clean_rtn(rtn: tuple) -> tuple:
+    cleaned=[]
+    for t in rtn:
+        cleaned.append(tuple([t[i] for i in range(len(rtn)-1)]))
+    return tuple(cleaned)
 
 
-# execute a sql statement
-def exec_sql(sql: str, mysql, commit=False) -> list:
+# execute a sql statement, return a tuple of tuples corresponding to rows in a table
+def exec_sql(sql: str, mysql, commit=False) -> tuple:
     cur = mysql.connection.cursor()
     cur.execute(sql)
     if commit:
         mysql.connection.commit()
-    return cur.fetchall()
+    raw_data=cur.fetchall()
+    return _clean_rtn(raw_data)
 
 
 # returns an encrypted password
@@ -47,143 +35,19 @@ def encrypt_password(password: str) -> str:
     return hash_object.hexdigest()
 
 
-def check_datetime_format(DATE: str) -> None:
+# make sure that datetime is in a MYSQL-friendly format
+def check_datetime_format(DATE: str) -> None: # TODO : make sure all date times are okay
     try:
         datetime.datetime.strptime(DATE, '%Y%m%d %H%M%S')
     except ValueError:
-        raise ValueError(f'Incorrect date format {DATE}, must be YYYYMMDD')
+        raise ValueError(f'Incorrect date format {DATE}, must be YYYYMMDD HHMMSS')
 
-
+# return the date X days from today
 def date_in_X_days(NUM_DAYS: int) -> str:
     today_plus_X = str(datetime.date.today() + datetime.timedelta(days=NUM_DAYS))
-    time_str = today_plus_X[0:4] + today_plus_X[5:7] + today_plus_X[8:10]
-    check_datetime_format(time_str)
+    time_str = today_plus_X[0:4] + today_plus_X[5:7] + today_plus_X[8:10] + ' 000000'
+    check_datetime_format(time_str) # TODO: fix this formatting
     return time_str
-
-
-# ******
-# LOG IN
-# ******
-
-def store_verify(session, customer_tokens, staff_tokens):
-    username_or_email = ""
-    key = ""
-    c_logged = False
-    s_logged = False
-
-    if "username" in session:
-        username_or_email = session["username"]
-    if "key" in session:
-        key = session["key"]
-
-    if username_or_email in customer_tokens:
-        if customer_tokens[username_or_email] == key:
-            c_logged = True
-
-    if username_or_email in staff_tokens:
-        if staff_tokens[username_or_email] == key:
-            s_logged = True
-
-    return c_logged, s_logged
-
-
-# check if a staff's log in credentials exists
-def query_staff_credentials(USERNAME: str, PASSWORD: str, mysql) -> list:
-    ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
-    #print(f'MySQL: Query Staff {USERNAME} {ENCRYPTED_PASSWORD}')
-    sql = f'''
-        SELECT *
-        FROM airline_staff
-        WHERE username = '{USERNAME}'
-            AND password = '{ENCRYPTED_PASSWORD}';
-        '''
-    return exec_sql(sql, mysql)
-
-
-# check if a customer's log in credentials exists
-def query_customer_credentials(EMAIL: str, PASSWORD: str, mysql) -> list:
-    ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
-    sql = f'''
-        SELECT *
-        FROM customer
-        WHERE email = '{EMAIL}'
-            AND password = '{ENCRYPTED_PASSWORD}';
-        '''
-    return exec_sql(sql, mysql)
-
-
-# ******************
-# STAFF REGISTRATION
-# ******************
-
-# check if a staff's username exists
-def query_staff_username(USERNAME: str, mysql) -> bool:
-    sql = f'''
-    SELECT *
-    FROM airline_staff
-    WHERE username = '{USERNAME}';
-    '''
-    username_exists = exec_sql(sql, mysql)
-    if username_exists:
-        return True
-    return False
-
-
-# check if a staff's employer exists
-def query_staff_employer(EMPLOYER: str, mysql) -> bool:
-    sql = f'''
-    SELECT *
-    FROM airline
-    WHERE name = '{EMPLOYER}';
-    '''
-    employer_exists = exec_sql(sql, mysql)
-    if employer_exists:
-        return True
-    return False
-
-
-# create a staff account
-def create_staff_account(USERNAME: str, PASSWORD: str, FNAME: str,
-                         LNAME: str, DOB: str, EMPLOYER: str, mysql) -> None:
-    ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
-    sql = f'''
-    INSERT INTO airline_staff
-    VALUES ('{USERNAME}','{ENCRYPTED_PASSWORD}','{FNAME}',
-        '{LNAME}','{DOB}','{EMPLOYER}');
-    '''
-    exec_sql(sql, mysql, commit=True)
-
-
-# *********************
-# CUSTOMER REGISTRATION
-# *********************
-
-# check if a customer's email exists
-def query_customer_email(EMAIL: str, mysql) -> bool:
-    sql = f'''
-    SELECT *
-    FROM customer
-    WHERE email = '{EMAIL}';
-    '''
-
-    account_exists = exec_sql(sql, mysql)
-    if account_exists:
-        return True
-    return False
-
-
-# create a customer account
-def create_customer_account(EMAIL: str, NAME: str, PASSWORD: str, BUILDING_NUM: str, CITY: str, STATE: str,
-                            STREET: str, PP_COUNTRY: str, PP_NUM: str, PP_EXPR: str, DOB: str,
-                            PHONE_NUM: str, mysql) -> None:
-    ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
-    sql = f'''
-    INSERT INTO customer
-    VALUES ('{EMAIL}','{NAME}','{ENCRYPTED_PASSWORD}','{BUILDING_NUM}','{CITY}','{STATE}',
-            '{STREET}','{PP_COUNTRY}','{PP_NUM}','{PP_EXPR}','{DOB}','{PHONE_NUM}');
-    '''
-    exec_sql(sql, mysql, commit=True)
-
 
 # Takes many works and checks that they are valid as a group
 def parse_input(inputs: list[str], ispass=False) -> bool:
