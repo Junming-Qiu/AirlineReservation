@@ -81,6 +81,7 @@ def loginAuth():
     if is_staff:
         session['username'] = username_or_email
         session['key'] = encrypt_password(username_or_email + password)
+        #session['employer'] = ...
         staff_tokens[username_or_email] = session["key"]
         return redirect(url_for("staff"))
 
