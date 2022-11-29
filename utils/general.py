@@ -11,6 +11,8 @@ General purpose functions.
 
 '''
 
+
+
 # DO NOT CALL OUTSIDE exec_sql()
 def _clean_rtn(rtn: tuple) -> tuple:
     cleaned=[]

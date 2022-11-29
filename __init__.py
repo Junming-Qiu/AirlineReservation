@@ -3,11 +3,10 @@ from flask_mysqldb import MySQL
 import os
 import sys
 sys.path.insert(0, os.getcwd())
-
+from utils.general import *
 from utils.customer import *
 from utils.staff import *
 from utils.public_info import *
-from utils.general import *
 from utils.register import *
 from utils.login import *
 
@@ -49,26 +48,41 @@ b. Will be able to see the flights status based on airline name, flight number, 
 '''
 @app.route('/public')
 def public():
-    headings,data=public_view_oneway_flights(mysql)
-    return render_template('public_info.html',headings=headings,data=data)
+    #headings,data=public_view_oneway_flights(mysql)
+    return render_template('public_info.html')
 
 @app.route("/public_view_flights", methods=['GET', 'POST'])
 def public_view_flight():
+    c_org = None
+    c_dest = None
+    a_org = None
+    a_dest = None
+    dept_dt = None
+    return_dt = None
+    f_type=None
+
     try:
         f_type = request.form['flight_type']
-        if f_type=='two way':
-            headings, data = public_view_twoway_flights(mysql)
-            return render_template('public_info.html', headings=headings, data=data)
-        if f_type=='one way':
-            headings, data = public_view_oneway_flights(mysql)
-            return render_template('public_info.html', headings=headings, data=data)
-        else:
-            error="Flight Type must be 'one way' or 'two way'"
-            render_template('public_info.html', error=error)            # error msg not displaying for some reason
+        c_org = request.form['city_origin']
+        c_dest = request.form['city_dest']
+        a_org = request.form['airport_origin']
+        a_dest = request.form['airport_dest']
+        dept_dt = request.form['dept_dt']
+        return_dt = request.form['return_dt']
     except:
         pass
-    headings, data = public_view_oneway_flights(mysql)
-    return render_template('public_info.html', headings=headings, data=data)
+
+    if f_type=='two way':
+        headings, data = public_view_twoway_flights(mysql,CITY_ORIGIN=c_org,CITY_DEST=c_dest,AP_ORIGIN=a_org,
+                                                    AP_DEST=a_dest,START_DATE=dept_dt,END_DATE=return_dt)
+        return render_template('public_info.html', headings=headings, data=data)
+    elif f_type=='one way':
+        headings, data = public_view_oneway_flights(mysql,CITY_ORIGIN=c_org,CITY_DEST=c_dest,AP_ORIGIN=a_org,
+                                                    AP_DEST=a_dest,START_DATE=dept_dt,END_DATE=return_dt)
+        return render_template('public_info.html', headings=headings, data=data)
+    else:
+        error="Flight Type must be 'one way' or 'two way'"
+        render_template('public_info.html', error=error)
 
 ### STAFF LOG IN ###
 

@@ -29,6 +29,7 @@ This covers:
 '''
 
 # TODO: add, search by flight_num
+# TODO: add, view flight status
 
 
 def public_view_twoway_flights(mysql, START_DATE=None, END_DATE=None,
@@ -120,11 +121,11 @@ def public_view_oneway_flights(mysql, START_DATE=None, END_DATE=None,
 
     if CITY_ORIGIN:
         sql+=f'''
-        AND ap_origin.name='{CITY_ORIGIN}' '''
+        AND ap_origin.city='{CITY_ORIGIN}' '''
 
     if CITY_DEST:
         sql+=f'''
-        AND ap_dest.name='{CITY_DEST}' '''
+        AND ap_dest.city='{CITY_DEST}' '''
 
     sql+=';'
     data=exec_sql(sql,mysql)
@@ -135,3 +136,7 @@ def public_view_oneway_flights(mysql, START_DATE=None, END_DATE=None,
               'Departure',
               'Price')
     return (headings,data)
+
+
+def public_view_flight_status(FLIGHT_NUM, AIRPORT, DEPT_DT, mysql) -> tuple:
+    return
