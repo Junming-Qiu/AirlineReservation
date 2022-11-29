@@ -132,6 +132,36 @@ def _create_purchase(EMAIL: str, TID: str, PURCHASE_DT: str, SOLD_PRICE: str,
     '''
     exec_sql(sql, mysql, commit=True)
 
+
+def get_sold_price(FNUM: str, AIRLINE: str, DEPT_DT: str,
+                   BPRICE: str, mysql):
+    """Determines if 25% surcharge is added onto ticket base price before selling
+    (decided by flight capacity). Also makes sure flight isn't already full."""
+    sql = f'''
+            SELECT num_of_seats
+            FROM airplane NATURAL JOIN flight
+            WHERE flight_number = FNUM AND airline_name = AIRLINE AND departure_date_time = DEPT_DT;
+            '''
+    capacity = exec_sql(sql, mysql)
+    # assuming tickets are only created when a customer tries to buy one
+    # so number of tickets in purchase table = num tickets sold
+    sql = f'''
+            SELECT COUNT(*)
+            FROM purchase NATURAL JOIN ticket
+            WHERE flight_number = FNUM AND airline_name = AIRLINE AND departure_date_time = DEPT_DT;
+            '''
+    tickets_sold = exec_sql(sql, mysql)
+
+    if tickets_sold >= capacity:
+        price = None
+    elif tickets_sold >= (0.6 * capacity):
+        price = float(BPRICE) * 1.25
+    else:
+        price = float(BPRICE)
+
+    return price
+
+
 # purchase a ticket of a flight
 def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # flight info
                              SPRICE: str, BPRICE: str,
@@ -139,7 +169,10 @@ def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # fl
                              EMAIL: str,                                    # customer info
                              mysql):
 
-    # ?. check for available seats
+    # check for available seats and price ticket accordingly
+    sp = get_sold_price(FNUM, AIRLINE, DEPT_DT, BPRICE, mysql)
+    if sp is None:
+        # return some kind of error/message about how the flight is full?
 
     # 1. make ticket
     ticket_id=_create_ticket(FNUM, AIRLINE, DEPT_DT, mysql)
@@ -152,8 +185,8 @@ def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # fl
 
     # 3. make purchase
     today = date_in_X_days(0)
-    _create_purchase(EMAIL, ticket_id, today, SPRICE, BPRICE, CNUM)
-
+    _create_purchase(EMAIL, ticket_id, today, sp, BPRICE, CNUM)  # swapped SPRICE for sp
+    # do we also need to make entry in ticket table (in addition to purchase table)?
 
 
 ### CANCEL A TRIP ##
