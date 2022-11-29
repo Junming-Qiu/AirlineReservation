@@ -46,8 +46,8 @@ a. Search for future flights based on source city/airport name, destination city
 
 b. Will be able to see the flights status based on airline name, flight number, arrival/departure date.
 '''
-@app.route('/public')
-def public():
+@app.route('/public_info')
+def public_info():
     #headings,data=public_view_oneway_flights(mysql)
     return render_template('public_info.html')
 
@@ -83,6 +83,29 @@ def public_view_flight():
     else:
         error="Flight Type must be 'one way' or 'two way'"
         render_template('public_info.html', error=error)
+
+
+@app.route('/public_status')
+def public_status():
+    return render_template('public_status.html')
+
+@app.route("/public_view_flights", methods=['GET', 'POST'])
+def public_check_status():
+    fnum=None
+    airline=None
+    dept_dt=None
+
+    try:
+        fnum=request.form['flight_num']
+        airline=request.form['airline']
+        dept_dt=request.form['dept_dt']
+
+        headings,data = public_view_flight_status(fnum, airline, dept_dt)
+        return render_template('public_status.html', headings=headings, data=data)
+
+    except:
+        error='Bad inputs'
+        return render_template('public_status.html', error=error)
 
 ### STAFF LOG IN ###
 
