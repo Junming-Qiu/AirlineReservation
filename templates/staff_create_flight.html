@@ -1,0 +1,43 @@
+{%extends "base.html"%}
+{%block content%}
+<div class="cinput">
+    <h1>Airline Reservation System for Staff</h1>
+    <h2>Create a Flight for {{airline}}</h2>
+
+    <form class="cinput" action="/staff_create_flight_submit" method="POST">
+        <input type="flight_num" name="flight_num" placeholder="Flight Number"/>
+        <input type="dept_time" name="dept_time" placeholder="Departure Time YYYYMMDD"/>
+        <input type="arr_time" name="arr_time" placeholder="Arrival Time YYYYMMDD"/>
+        <input type="source" name="source" placeholder="Origin"/>
+        <input type="destination" name="destination" placeholder="Destination"/>
+        <input type="base_price" name="base_price" placeholder="Base Price"/>
+
+        <div>
+            <label for="airplane_id">Airplane ID:</label>
+            <select name="airplane_id" id="airplane_id" placeholder="Airplane ID">
+                <option value="---">---</option>
+                {%for plane in planes%}
+                <option value="{{plane}}">{{plane[0]}}</option>
+                {%endfor%}
+            </select>
+        </div>
+
+        <div>
+            <label for="status">Status: </label>
+            <select name="status" id="status" placeholder="Status">
+                <option value="---">---</option>
+                <option value="on time">On Time</option>
+                <option value="delayed">Delayed</option>
+                <option value="canceled">Canceled</option>
+                <option value="complete">Complete</option>
+            </select>
+        </div>
+
+    <input type="submit" value="Submit"/>
+
+    </form>
+    <a href="/staff">Back</a>
+</div>
+
+
+{%endblock%}

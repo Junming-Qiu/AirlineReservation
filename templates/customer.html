@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if is_customer %}
+    <h1 class="textcenter">Airline Reservation System for Customers</h1>	
+    <h2>Welcome,&ensp;{{username}}</h2>
+    <p>What would you like to do?</p>
+    <div class="stack textcenter">
+        
+    
+        <a href="">View My Flights</a>
+        
+        <a href="">Search for Flights</a> 
+        <a href="">Purchase Tickets</a>
+        <a href="">Cancel Trip</a> 
+        <a href="">Rate/Comment on Previous Flights</a> 
+        <a href="">Track my Spending</a> 
+        <a href="/logout">Log Out</a>
+    </div>
+			
+{% endif %}
+
+{%endblock%}

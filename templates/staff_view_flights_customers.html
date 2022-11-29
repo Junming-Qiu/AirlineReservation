@@ -1,0 +1,24 @@
+{%extends "base.html"%}
+{%block content%}
+<div class="cinput">
+    <h1>Airline Staff View Flights</h1>
+    <h3>Flight: {{flight_number}}</h3>
+        {%if not result%}
+        <h3>No Customers</h3>
+        {%else%}
+        <table>
+            <tr><td><b>Customer Name</b></td></tr>
+            {%for customer in customers%}        
+                <tr>
+                    <td>{{customer[0]}}</td>
+                </tr>
+            {%endfor%}
+        </table>
+        {%endif%}
+</div>
+
+    
+
+
+
+{%endblock%}
