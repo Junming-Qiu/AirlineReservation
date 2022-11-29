@@ -1,4 +1,4 @@
-from general import *
+from utils.general import *
 
 '''
 
@@ -35,13 +35,14 @@ def store_verify(session, customer_tokens, staff_tokens):
 
 
 # check if a staff's log in credentials exists
-def query_staff_credentials(USERNAME: str, PASSWORD: str, mysql) -> list:
+def query_staff_credentials(USERNAME: str, PASSWORD: str, EMPLOYER: str, mysql) -> list:
     ENCRYPTED_PASSWORD = encrypt_password(PASSWORD)
     sql = f'''
         SELECT *
         FROM airline_staff
         WHERE username = '{USERNAME}'
-            AND password = '{ENCRYPTED_PASSWORD}';
+            AND password = '{ENCRYPTED_PASSWORD}'
+            AND employer = '{EMPLOYER}';
         '''
     return exec_sql(sql, mysql)
 

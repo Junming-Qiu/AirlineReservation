@@ -1,5 +1,6 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
+import flask_mysqldb as MySQL
 import os
 import sys
 sys.path.insert(0, os.getcwd())
@@ -52,7 +53,7 @@ def login():
         return redirect(url_for("staff"))
         
 
-    return render_template('login.html')
+    return render_template('login_customer.html')
 
 @app.route('/logout')
 def logout():
@@ -92,7 +93,7 @@ def loginAuth():
         return redirect(url_for("customer"))
 
     error = 'Log in credentials are incorrect'
-    return render_template('login.html', error=error)
+    return render_template('login_customer.html', error=error)
 
 
 

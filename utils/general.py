@@ -15,19 +15,23 @@ General purpose functions.
 def _clean_rtn(rtn: tuple) -> tuple:
     cleaned=[]
     for t in rtn:
-        cleaned.append(tuple([t[i] for i in range(len(rtn)-1)]))
+        cleaned.append(tuple([t[i] for i in range(len(t-1))]))
     return tuple(cleaned)
 
 
 # execute a sql statement, return a tuple of tuples corresponding to rows in a table
 def exec_sql(sql: str, mysql, commit=False) -> tuple:
     cur = mysql.connection.cursor()
+    print(f'''
+    EXECUTING QUERY:
+    {sql}''')
     cur.execute(sql)
     if commit:
         mysql.connection.commit()
     raw_data=cur.fetchall()
-    return _clean_rtn(raw_data)
-
+    # print(raw_data)
+    # return _clean_rtn(raw_data)
+    return raw_data
 
 # returns an encrypted password
 def encrypt_password(password: str) -> str:
@@ -45,8 +49,8 @@ def check_datetime_format(DATE: str) -> None: # TODO : make sure all date times 
 # return the date X days from today
 def date_in_X_days(NUM_DAYS: int) -> str:
     today_plus_X = str(datetime.date.today() + datetime.timedelta(days=NUM_DAYS))
-    time_str = today_plus_X[0:4] + today_plus_X[5:7] + today_plus_X[8:10] + ' 000000'
-    check_datetime_format(time_str) # TODO: fix this formatting
+    time_str = today_plus_X[0:4] + today_plus_X[5:7] + today_plus_X[8:10] #+ ' 000000' # TODO: fix this formatting
+    #check_datetime_format(time_str) # TODO: fix this formatting
     return time_str
 
 # Takes many works and checks that they are valid as a group
