@@ -138,7 +138,7 @@ def public_view_oneway_flights(mysql, START_DATE=None, END_DATE=None,
     return (headings,data)
 
 
-def public_view_flight_status(FLIGHT_NUM, AIRLINE, DEPT_DT, mysql) -> tuple:
+def public_view_flight_status(mysql, FLIGHT_NUM, AIRLINE, DEPT_DT) -> tuple:
     sql=f'''
     SELECT f.flight_num,f.airline,f.dept_datetime,f.flight_status
     FROM flight as f
