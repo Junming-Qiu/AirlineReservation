@@ -28,6 +28,8 @@ This covers:
 
 '''
 
+# TODO: add, search by flight_num
+
 
 def public_view_twoway_flights(mysql, START_DATE=None, END_DATE=None,
                                       AP_ORIGIN=None, AP_DEST=None,

@@ -50,9 +50,25 @@ b. Will be able to see the flights status based on airline name, flight number, 
 @app.route('/public')
 def public():
     headings,data=public_view_oneway_flights(mysql)
-    print(data)
-    return render_template('table_template.html',headings=headings,data=data)
+    return render_template('public_info.html',headings=headings,data=data)
 
+@app.route("/public_view_flights", methods=['GET', 'POST'])
+def public_view_flight():
+    try:
+        f_type = request.form['flight_type']
+        if f_type=='two way':
+            headings, data = public_view_twoway_flights(mysql)
+            return render_template('public_info.html', headings=headings, data=data)
+        if f_type=='one way':
+            headings, data = public_view_oneway_flights(mysql)
+            return render_template('public_info.html', headings=headings, data=data)
+        else:
+            error="Flight Type must be 'one way' or 'two way'"
+            render_template('public_info.html', error=error)            # error msg not displaying for some reason
+    except:
+        pass
+    headings, data = public_view_oneway_flights(mysql)
+    return render_template('public_info.html', headings=headings, data=data)
 
 ### STAFF LOG IN ###
 
