@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"   />
-        <title>Document</title>
-    </head>
-    <body>
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+    <h1>Public View Flights</h1>
         <form class="cinput" action="/public_view_flights" method="POST">
 			<input type="text" name = "flight_type" placeholder="'one way' OR 'two way'" required/> </br>
 
@@ -22,24 +19,31 @@
 			{% if error %}
 				<p class="error"><strong>Error:</strong> {{error}}</p>
 			{% endif %}
-            <a href="/">Go back</a>
 		</form>
+</div>
+<div class="cinput">
+{% if data %}
+    <h3>Results:</h3>
 
-
-        <table>
-            <tr>
-                {% for header in headings %}
-                <th>{{ header }}</th>
-                {% endfor %}
-            </tr>
-
-            {% for row in data %}
-            <tr>
-                {% for cell in row %}
-                <td>{{ cell }}</td>
-                {% endfor %}
-            </tr>
+    <table>
+        <tr>
+            {% for header in headings %}
+            <th>{{ header }}</th>
             {% endfor %}
-        </table>
-    </body>
-</html>
+        </tr>
+
+        {% for row in data %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+{%else%}
+<h3>No Results Found</h3>
+{%endif%}
+    <a href="/homepage_redirect">Go back</a>
+
+{%endblock%}
+

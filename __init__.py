@@ -113,15 +113,15 @@ def loginAuthCust():
         email = request.form['username']
         password = request.form['password']
     except:
-        return redirect(url_for("login"))
+        return redirect(url_for("login_customer"))
 
     # Parse input for security
     if not parse_input([email]):
-        return redirect(url_for("login"))
+        return redirect(url_for("login_customer"))
 
 
     if not parse_input([password], True):
-        return redirect(url_for("login"))
+        return redirect(url_for("login_customer"))
 
     is_customer = query_customer_credentials(email, password, mysql)
     if is_customer:
@@ -140,7 +140,14 @@ def logout():
     session["employer"] = ""
     return redirect('/')
 
-
+@app.route('/homepage_redirect')
+def homepage_redirect():
+    c_logged, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        return redirect(url_for('staff'))
+    if c_logged:
+        return redirect(url_for('customer'))
+    return redirect('/')
 
 ### STAFF REGISTER ###
 
@@ -279,7 +286,9 @@ def public_view_flight():
     a_dest = None
     dept_dt = None
     return_dt = None
-    f_type=None
+    f_type = None
+    headings = []
+    data = []
 
     try:
         f_type = request.form['flight_type']
@@ -291,6 +300,10 @@ def public_view_flight():
         return_dt = request.form['return_dt']
     except:
         pass
+
+    if not parse_input([c_org,c_dest,a_org,a_dest,dept_dt,return_dt,f_type]):
+        return render_template('public_info.html', headings=headings, data=data)
+
 
     if f_type=='two way':
         headings, data = public_view_twoway_flights(mysql,CITY_ORIGIN=c_org,CITY_DEST=c_dest,AP_ORIGIN=a_org,
@@ -320,6 +333,10 @@ def public_check_status():
         dept_dt=request.form['dept_dt']
     except:
         error='Bad inputs'
+        return render_template('public_status.html', error=error)
+
+    if not parse_input([fnum,airline,dept_dt]):
+        error = 'Bad inputs'
         return render_template('public_status.html', error=error)
 
     headings, data = public_view_flight_status(mysql, fnum, airline, dept_dt)
@@ -466,11 +483,12 @@ def customer_view_flight():
                                                AP_ORIGIN=a_org, AP_DEST=a_dest, CITY_ORIGIN=c_org, CITY_DEST=c_dest)
         return render_template('customer_view_flights.html', headings=headings, data=data)
     else:
-        print('NOT LOGGED AS CUSTOMER')
         return redirect('/')
 
 
-
+@app.route('/customer_search_flight')
+def customer_search_flight():
+    return redirect(url_for("public_info"))
 
 
 
