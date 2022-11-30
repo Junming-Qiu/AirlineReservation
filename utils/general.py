@@ -65,6 +65,9 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
         '?', '-', '(', ')', '{', '}', '[', ']']
 
     for word in inputs:
+        if word is None: # added this for optional params w/o input
+            continue
+
         if ispass:
             print("password", ' ' in word)
             if ' ' in word:
@@ -79,4 +82,5 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
             if c not in alpha_lower and c not in alpha_upper and c not in nums and c in restrict:
                 print(f"failed to parse {word}")
                 return False
+    print(f'Successfully parsed: {inputs}')
     return True

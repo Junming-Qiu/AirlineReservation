@@ -362,7 +362,8 @@ def staff_view_flights():
 
         return render_template('staff_view_flights.html', flights=flights)
 
-    return redirect(url_for("login"))
+    return redirect('/')
+
 
 # TODO: fix
 # @app.route("/staff_view_flights_customer/<string:flight_number>/<string:airline>/<string:dept_dt>")
@@ -380,7 +381,7 @@ def staff_view_flights():
 #
 #         return render_template('staff_view_flights_customers.html', customers=customers, flight_number=flight_number, result=result)
 #
-#     return redirect(url_for("login"))
+#     return redirect(url_for("login")) THESE HAVE TO CHANGE, login doesn't exists anymore
 
 @app.route("/staff_create_flight")
 def staff_create_flight_view():
@@ -431,6 +432,55 @@ def staff_create_flight_submit():
                 next='/staff')
 
     return redirect(url_for("login_staff"))
+
+
+
+### CUSTOMER USE CASES ###
+@app.route('/customer_view_flight', methods=["POST", "GET"])
+def customer_view_flight():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        s_date = None
+        e_date = None
+        a_org = None
+        a_dest = None
+        c_org = None
+        c_dest = None
+        flights = []
+
+        try:
+            s_date = request.form['after']
+            e_date = request.form['before']
+            a_org = request.form['source']
+            a_dest = request.form['destination']
+            c_org = request.form['s_city']
+            c_dest = request.form['d_city']
+        except:
+            pass
+
+        if not parse_input([s_date,e_date,a_org,a_dest,c_org,c_dest]):
+            return render_template('customer_view_flights.html')
+
+        email = session['username']
+        headings, data = customer_view_my_flights(email, mysql, START_DATE=s_date, END_DATE=e_date,
+                                               AP_ORIGIN=a_org, AP_DEST=a_dest, CITY_ORIGIN=c_org, CITY_DEST=c_dest)
+        return render_template('customer_view_flights.html', headings=headings, data=data)
+    else:
+        print('NOT LOGGED AS CUSTOMER')
+        return redirect('/')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000

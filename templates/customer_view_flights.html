@@ -1,0 +1,43 @@
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+    <h1>Customer View Flights</h1>
+    <form class="cinput" action="/customer_view_flight" method="POST">
+        <input type="after" name="after" placeholder="Date 1 YYYYMMDD"/>
+        <input type="before" name="before" placeholder="Date 2 YYYYMMDD"/>
+        <input type="source" name="source" placeholder="Source Airport"/>
+        <input type="destination" name="destination" placeholder="Destination Airport"/>
+        <input type="s_city" name="s_city" placeholder="Source City"/>
+        <input type="d_city" name="d_city" placeholder="Destination City"/>
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+<div class="cinput">
+{% if data %}
+    <h3>Results:</h3>
+      
+    <table>
+        <tr>
+            {% for header in headings %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+
+            {% for row in data %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+    </table>
+    
+{%else%}
+<h3>No Results Found</h3>
+{%endif%}
+<a href="/customer">Back</a>
+</div>
+
+
+{%endblock%}
