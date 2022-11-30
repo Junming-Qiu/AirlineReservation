@@ -115,7 +115,7 @@ def _create_card_info(NUM: str, EXPR: str, NAME: str,
     if TYPE not in ('credit', 'debit'):
         raise Exception('Invalid card type')
 
-    if not (_card_exists(NUM)):
+    if not (_card_exists(NUM, mysql)):
         sql=f'''
         INSERT INTO card_info
         VALUES ('{NUM}',{EXPR},'{NAME}','{TYPE}');
@@ -138,20 +138,36 @@ def get_sold_price(FNUM: str, AIRLINE: str, DEPT_DT: str,
     """Determines if 25% surcharge is added onto ticket base price before selling
     (decided by flight capacity). Also makes sure flight isn't already full."""
     sql = f'''
-            SELECT num_of_seats
-            FROM airplane NATURAL JOIN flight
-            WHERE flight_number = FNUM AND airline_name = AIRLINE AND departure_date_time = DEPT_DT;
+            SELECT ap.num_seats
+            FROM airplane as ap JOIN flight as f
+                ON ap.id = f.airplane_id
+            WHERE f.flight_num = '{FNUM}'
+             AND f.airline = '{AIRLINE}'
+             AND f.dept_datetime = {DEPT_DT};
             '''
-    capacity = exec_sql(sql, mysql)
+    try:
+        capacity = exec_sql(sql, mysql)[0][0]
+    except:
+        capacity = -1 # TODO change to error msg - result of bad seasrch
+
+
     # assuming tickets are only created when a customer tries to buy one
     # so number of tickets in purchase table = num tickets sold
     sql = f'''
             SELECT COUNT(*)
-            FROM purchase NATURAL JOIN ticket
-            WHERE flight_number = FNUM AND airline_name = AIRLINE AND departure_date_time = DEPT_DT;
+            FROM purchase as p JOIN ticket as t 
+                ON p.ticket_id = t.id
+            GROUP BY t.flight_num, t.airline, t.dept_datetime
+            HAVING t.flight_num = '{FNUM}'
+             AND t.airline = '{AIRLINE}'
+             AND t.dept_datetime = {DEPT_DT};
             '''
-    tickets_sold = exec_sql(sql, mysql)
-
+    try:
+        tickets_sold = exec_sql(sql, mysql)[0][0]
+    except:
+        tickets_sold = 0
+    print(f'Tickets Sold: {tickets_sold}')
+    print(f'Capacity: {capacity}')
     if tickets_sold >= capacity:
         price = None
     elif tickets_sold >= (0.6 * capacity):
@@ -162,6 +178,16 @@ def get_sold_price(FNUM: str, AIRLINE: str, DEPT_DT: str,
     return price
 
 
+def get_base_price(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql):
+    sql=f'''
+    SELECT base_price
+    FROM flight
+    WHERE flight_num='{FNUM}'
+        AND airline='{AIRLINE}'
+        AND dept_datetime={DEPT_DT};
+    '''
+    return exec_sql(sql, mysql)[0][0]
+
 # purchase a ticket of a flight
 def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # flight info
                              SPRICE: str, BPRICE: str,
@@ -169,22 +195,20 @@ def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # fl
                              EMAIL: str,                                    # customer info
                              mysql):
 
-    # ?. check for available seats
-    sp = get_sold_price(FNUM, AIRLINE, DEPT_DT, BPRICE, mysql)
-    if sp is None:
-        pass # TODO: replace with error message
+    # 0. check for available seats
+    # MOVED TO __init__
+
+
     # 1. make ticket
     ticket_id=_create_ticket(FNUM, AIRLINE, DEPT_DT, mysql)
 
     # 2. check for card info / make card info
-    try:
-        _create_card_info(CNUM, EXPR, NAME, TYPE)
-    except:
-        pass
+    _create_card_info(CNUM, EXPR, NAME, TYPE, mysql)
+
 
     # 3. make purchase
     today = date_in_X_days(0)
-    _create_purchase(EMAIL, ticket_id, today, SPRICE, BPRICE, CNUM)
+    _create_purchase(EMAIL, ticket_id, today, SPRICE, BPRICE, CNUM, mysql)
 
 
 

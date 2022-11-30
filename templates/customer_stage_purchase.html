@@ -1,0 +1,38 @@
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+    <h1>Customer Select Flights</h1>
+        <form class="cinput"
+              action="/customer_confirm_purchase/{{flight_data[0]}}/{{flight_data[1]}}/{{flight_data[2]}}/{{flight_data[3]}}"
+              method="POST">
+
+            <input type="text" name = "cc_num" placeholder="Card Number" required /></br>
+            <input type="text" name = "cc_expr" placeholder="Card Expiration Date YYYYMMDD" required /> </br>
+            <input type="text" name = "cc_name" placeholder="Name on Card"  required/> </br>
+            <input type="text" name = "cc_type" placeholder="debit Or credit"  required/> </br>
+
+			<input type="submit" value = Purchase />
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+           {% if confirmation %}
+				<p><strong>Success:</strong> {{confirmation}}</p>
+			{% endif %}
+		</form>
+</div>
+<div class="cinput">
+    <table>
+        <tr>
+            <th>{{ header }}</th>
+        </tr>
+
+        <tr>
+            <th>{{ data }}</th>
+        </tr>
+    </table>
+
+    <a href="/homepage_redirect">Go back</a>
+
+{%endblock%}
+

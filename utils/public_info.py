@@ -85,7 +85,7 @@ def public_view_twoway_flights(mysql, START_DATE=None, END_DATE=None,
               'Flight Number 2',
               'Airline 2',
               'Departure 2',
-              'Price')
+              'Base Price')
     return (headings,data)
 
 # search for one-way flights
@@ -134,7 +134,7 @@ def public_view_oneway_flights(mysql, START_DATE=None, END_DATE=None,
               'Flight Number',
               'Airline',
               'Departure',
-              'Price')
+              'Base Price')
     return (headings,data)
 
 

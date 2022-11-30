@@ -1,0 +1,51 @@
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+    <h1>Customer View Flights</h1>
+        <form class="cinput" action="/customer_purchase_search_flights" method="POST">
+
+            <input type="text" name = "city_origin" placeholder="city origin" /> </br>
+            <input type="text" name = "city_dest" placeholder="city destination" /> </br>
+
+            <input type="text" name = "airport_origin" placeholder="airport origin"/> </br>
+            <input type="text" name = "airport_dest" placeholder="airport destination"/> </br>
+
+            <input type="text" name = "dept_dt" placeholder="departure date"/> </br>
+            <input type="text" name = "return_dt" placeholder="return date"/> </br>
+
+			<input type="submit" value = Search />
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+		</form>
+</div>
+<div class="cinput">
+{% if data %}
+    <h3>Flights:</h3>
+
+    <table>
+        <tr>
+            {% for header in headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for row in data %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+            <td>
+                <a href="/customer_stage_purchase/{{row[2]}}/{{row[3]}}/{{row[4]}}/{{row[5]}}">Select to Purchase</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{%else%}
+<h3>No Results Found</h3>
+{%endif%}
+    <a href="/homepage_redirect">Go back</a>
+
+{%endblock%}
+

@@ -485,18 +485,105 @@ def customer_view_flight():
     else:
         return redirect('/')
 
-
 @app.route('/customer_search_flight')
 def customer_search_flight():
     return redirect(url_for("public_info"))
 
+@app.route('/customer_init_purchase', methods=["POST", "GET"])
+def customer_init_purchase():
+    headings, data = public_view_oneway_flights(mysql)
+    return render_template('customer_purchase_flight.html', headings=headings, data=data)
+
+# DOES NOT HANDLE two-way flights
+@app.route('/customer_purchase_search_flights', methods=["POST", "GET"])
+def customer_purchase_search_flights():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        c_org = None
+        c_dest = None
+        a_org = None
+        a_dest = None
+        dept_dt = None
+        return_dt = None
+        headings = []
+        data = []
+
+        try:
+            c_org = request.form['city_origin']
+            c_dest = request.form['city_dest']
+            a_org = request.form['airport_origin']
+            a_dest = request.form['airport_dest']
+            dept_dt = request.form['dept_dt']
+            return_dt = request.form['return_dt']
+        except:
+            pass
+
+        if not parse_input([c_org, c_dest, a_org, a_dest, dept_dt, return_dt]):
+            return render_template('customer_purchase_flight.html', headings=headings, data=data)
 
 
+        headings, data = public_view_oneway_flights(mysql, CITY_ORIGIN=c_org, CITY_DEST=c_dest, AP_ORIGIN=a_org,
+                                                    AP_DEST=a_dest, START_DATE=dept_dt, END_DATE=return_dt)
+        return render_template('customer_purchase_flight.html', headings=headings, data=data)
 
+    return redirect(url_for("login_customer"))
 
+@app.route('/customer_stage_purchase/<string:flight_number>/<string:airline>/<string:dept_dt>/<string:base_price>',
+           methods=["POST", "GET"])
+def customer_stage_purchase(flight_number, airline, dept_dt, base_price):
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        clean_dt = dept_dt[0:4] + dept_dt[5:7] + dept_dt[8:10]
 
+        sp=get_sold_price(flight_number,airline,clean_dt,base_price,mysql)
+        if sp==None:
+            error='Failed to purchase ticket. Flight capacity full.'
+            return render_template('customer_stage_purchase.html', error=error)
+        heading=('Final Price')
+        data=(str(sp))
+        flight_data = [flight_number,airline,clean_dt,base_price,sp]
+        return render_template('customer_stage_purchase.html', flight_data=flight_data, header=heading, data=data)
 
+    return redirect(url_for("login_staff"))
 
+@app.route('/customer_confirm_purchase/<string:flight_number>/<string:airline>/<string:dept_dt>/<string:base_price>',
+           methods=["POST", "GET"])
+def customer_confirm_purchase(flight_number, airline, dept_dt, base_price):
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+
+        cc_num = None
+        cc_expr = None
+        cc_name = None
+        cc_type = None
+        sold_price = None
+        flight_data=[]
+        try:
+            cc_num = request.form['cc_num']
+            cc_expr = request.form['cc_expr']
+            cc_name = request.form['cc_name']
+            cc_type = request.form['cc_type']
+        except:
+            error = 'Bad Inputs'
+            return render_template('customer_stage_purchase.html', error=error)
+
+        if not parse_input( [cc_num,cc_expr,cc_name,cc_type] ):
+            error = 'Bad inputs'
+            return render_template('customer_stage_purchase.html', error=error)
+
+        if cc_type not in ['credit', 'debit']:
+            error = "Bad inputs. Card type must be 'credit' or 'debit'"
+            render_template('customer_stage_purchase.html', error=error)
+
+        email = session['username']
+
+        sold_price = get_sold_price(flight_number, airline, dept_dt, base_price, mysql)
+        customer_purchase_ticket(flight_number, airline, dept_dt, sold_price, base_price, cc_num, cc_expr, cc_name,
+                                 cc_type, email, mysql)
+        flight_data = [flight_number, airline, dept_dt, base_price, sold_price]
+        return render_template('customer_stage_purchase.html', confirmation=' Purchase Created', flight_data=flight_data)
+
+    return redirect(url_for("login_staff"))
 
 
 
@@ -506,3 +593,5 @@ app.secret_key = 'some key that you will never guess'
 # for changes to go through, TURN OFF FOR PRODUCTION
 if __name__ == "__main__":
     app.run('127.0.0.1', 5000, debug=True)
+
+

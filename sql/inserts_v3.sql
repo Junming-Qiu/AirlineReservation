@@ -32,7 +32,7 @@ insert into staff_phone_num values
 
 insert into flight values
     ('BA2491A', 'JetBlue', 'Xqts-cOKP-BRGn-AXMn', '2022-12-05',
-    '2022-12-04', 934.63, 'JFK', 'PVG', 'on time'),
+        '2022-12-04', 934.63, 'JFK', 'PVG', 'on time'),
 
     ('BA6492B', 'JetBlue', 'APHQ-enfB-uRrT-lMzD', '2022-11-05',
     '2022-12-05', 765.35, 'JFK', 'PVG', 'delayed'),
