@@ -1,0 +1,31 @@
+{%extends "base.html"%}
+
+{%block content%}
+<div class="cinput">
+    <h1>Airline Reservation System Customer Registration</h1>
+    <form class="cinput" action="/registerAuthCustomer" method="POST">
+
+        <input type="email" name = "email" placeholder="email" required/> </br>
+        <input type="text" name = "name" placeholder="name" required/> </br>
+        <input type="password" name = "password" placeholder="password" required/> </br>
+        <input type="text" name = "building_num" placeholder="building number" required/> </br>
+        <input type="text" name = "city" placeholder="city" required/> </br>
+        <input type="text" name = "state" placeholder="state" required/> </br>
+        <input type="text" name = "street" placeholder="street" required/> </br>
+        <input type="country" name = "pp_country" placeholder="passport country" required/> </br>
+        <input type="text" name = "pp_num" placeholder="passport number" required/> </br>
+        <input type="text" name = "pp_expr" placeholder="passport expiration YYYY-MM-DD" required/> </br>
+        <input type="text" name = "dob" placeholder="date of birth YYYY-MM-DD" required/> </br>
+        <input type="tel" name = "phone_num" placeholder="phone number" required/> </br>
+    
+        <input type="submit" value = Register />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+    <a href="/">Go back</a>
+</div>
+
+
+{%endblock%}
+

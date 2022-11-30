@@ -138,7 +138,7 @@ def logout():
     session["username"] = ""
     session["key"] = ""
     session["employer"] = ""
-    return redirect(url_for("login"))
+    return redirect('/')
 
 
 
