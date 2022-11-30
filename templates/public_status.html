@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"   />
+        <title>Document</title>
+    </head>
+    <body>
+        <form class="cinput" action="/public_check_status" method="POST">
+			<input type="text" name = "flight_num" placeholder="flight number" required/> </br>
+            <input type="text" name = "airline" placeholder="airline"/> </br>
+            <input type="text" name = "dept_dt" placeholder="departure date"/> </br>
+
+
+			<input type="submit" value = Search />
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+            <a href="/">Go back</a>
+		</form>
+
+
+        <table>
+            <tr>
+                {% for header in headings %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+
+            {% for row in data %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

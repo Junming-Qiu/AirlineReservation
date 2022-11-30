@@ -1,0 +1,75 @@
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+    <h1>Airline Staff View Flights</h1>
+    <form class="cinput" action="/staff_view_flights" method="POST">
+        <input type="before" name="before" placeholder="Date 1 YYYYMMDD"/>
+        <input type="after" name="after" placeholder="Date 2 YYYYMMDD"/>
+        <input type="source" name="source" placeholder="Source Airport"/>
+        <input type="destination" name="destination" placeholder="Destination Airport"/>
+        <input type="s_city" name="s_city" placeholder="Source City"/>
+        <input type="d_city" name="d_city" placeholder="Destination City"/>
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+<div class="cinput">
+{% if flights %}
+    <h3>Results:</h3>
+      
+    <table>
+        <tr>
+            <td>Flight Number</td>
+            <td>Airline</td>
+            <td>Airplane ID</td>
+            <td>Arrival</td>
+            <td>Departure</td>
+            <td>Base Price</td>
+            <td>Origin</td>
+            <td>Destination</td>
+            <td>Flight Status</td>
+        </tr>
+        {% for flight in flights%}
+        <tr>
+            <td>
+                {{flight[0]}}
+            </td>
+            <td>
+                {{flight[1]}}
+            </td>
+            <td>
+                {{flight[2]}}
+            </td>
+            <td>
+                {{flight[3]}}
+            </td>
+            <td>
+                {{flight[4]}}
+            </td>
+            <td>
+                {{flight[5]}}
+            </td>
+            <td>
+                {{flight[6]}}
+            </td>
+            <td>
+                {{flight[7]}}
+            </td>
+            <td>
+                {{flight[8]}}
+            </td>
+            <td>
+                <a href="/staff_view_flights_customer/{{flight[0]}}/{{flight[1]}}/{{flight[4]}}">View Customers</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+{%else%}
+<h3>No Results Found</h3>
+{%endif%}
+<a href="/staff">Back</a>
+</div>
+
+
+{%endblock%}

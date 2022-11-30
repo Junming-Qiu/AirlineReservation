@@ -1,0 +1,29 @@
+{%extends "base.html"%}
+{%block content%}
+<div class="cinput">
+    <h1>Airline Reservation System for Staff</h1>
+    <h2>Change Flight Status for {{airline}}</h2>
+    <form class="cinput" action="/staff_change_flight_status_submit" method="POST">
+    
+        <input type="flight_num" name="flight_num" placeholder="Flight Number"/>
+        <input type="dept_time" name="dept_time" placeholder="Departure Time"/>
+        <div>
+            <label for="status">Status: </label>
+            <select name="status" id="status" placeholder="Status">
+                <option value="---">---</option>
+                <option value="on time">On Time</option>
+                <option value="delayed">Delayed</option>
+                <option value="canceled">Canceled</option>
+                <option value="complete">Complete</option>
+            </select>
+        </div>
+        <input type="submit" value="Submit"/>
+        {%if error%}
+        <p>{{error}}</p>
+        {%endif%}
+        <a href="/staff">Back</a>
+    </form>
+</div>
+
+
+{%endblock%}
