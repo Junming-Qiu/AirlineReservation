@@ -1,0 +1,56 @@
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+{% if r_data %}
+    <h3>Past Reviews</h3>
+
+    <table>
+        <tr>
+            {% for header in r_headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for row in r_data %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+{%else%}
+<h3>No Past Reviews Found</h3>
+{%endif%}
+
+
+<div class="cinput">
+{% if f_data %}
+    <h3>Past Flights</h3>
+
+    <table>
+        <tr>
+            {% for header in f_headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for row in f_data %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+            <td>
+                <a href="/customer_stage_rate_and_comment/{{ row[0] }}">Rate and Comment</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{%else%}
+<h3>No Past Flights Found</h3>
+{%endif%}
+    <a href="/homepage_redirect">Go back</a>
+
+{%endblock%}
+

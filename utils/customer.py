@@ -261,22 +261,36 @@ def _validate_customer_took_flight(EMAIL: str, TID: str, mysql):
         AND p.customer_email='{EMAIL}'
         AND t.id='{TID}';
     '''
-    exec_sql(sql, mysql)
+    return exec_sql(sql, mysql)
+
 
 
 # create a review, comment
-def customer_create_flight_review(EMAIL: str, TID: str, RATING: str, COMMENT: str, mysql):
+def customer_create_review(EMAIL: str, TID: str, RATING: str, COMMENT: str, mysql):
 
     if _validate_customer_took_flight(EMAIL, TID, mysql): # customer was on flight
+        print('HERE')
         sql=f'''
-        INSERT INTO flight_rating
+        INSERT INTO flight_review
         VALUES ('{EMAIL}', '{TID}', {RATING}, '{COMMENT}');
         '''
         exec_sql(sql, mysql, commit=True)
     else:
         raise Exception('No available record of flight attendance')
 
-
+def customer_view_review(EMAIL, mysql):
+    sql=f'''
+    SELECT ticket_id, rating, comment
+    FROM flight_review
+    WHERE customer_email='{EMAIL}';
+    '''
+    data = exec_sql(sql, mysql)
+    headings = (
+        'Ticket ID',
+        'Rating',
+        'Comment'
+    )
+    return (headings, data)
 
 ### TRACK SPENDING ###
 
