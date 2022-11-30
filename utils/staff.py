@@ -12,10 +12,11 @@ NOTE : these functions do not ensure that the
 
 # USE CASE 1: view flights
 def staff_view_flight_all(AIRLINE: str, before, after, source, destination, s_city, d_city, mysql) -> tuple:
-    if not before:
+    # Must be checking for none, otherwise an empty form will set default to 30 days after today
+    if before == None:
         before = date_in_X_days(0)
 
-    if not after:
+    if after == None:
         after = date_in_X_days(30)
 
     sql = f'''
@@ -42,6 +43,7 @@ def staff_view_flight_all(AIRLINE: str, before, after, source, destination, s_ci
         sql += f" AND b.city = '{d_city}'"
 
     sql += ";"
+    print(sql)
     data = exec_sql(sql, mysql)
     headings =(
         'Flight Number',

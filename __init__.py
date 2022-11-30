@@ -21,7 +21,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'walrus123' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'Potatooo123!' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 
@@ -350,8 +350,9 @@ def staff_view_flights():
     _, s_logged = store_verify(session, customer_tokens, staff_tokens)
     if s_logged:
 
-        before = ""
-        after = ""
+        # Before and after are none because they will be set to the wrong value in the sql function otherwise
+        before = None
+        after = None
         source = ""
         destination = ""
         s_city = ""
@@ -375,30 +376,29 @@ def staff_view_flights():
             return render_template('staff_view_flights.html', flights=flights)
 
         airline = session['employer']
-        flights = staff_view_flight_all(airline, before, after, source, destination, s_city, d_city, mysql)
+        headings, flights = staff_view_flight_all(airline, before, after, source, destination, s_city, d_city, mysql)
 
-        return render_template('staff_view_flights.html', flights=flights)
+        return render_template('staff_view_flights.html', flights=flights, headings=headings)
 
     return redirect('/')
 
 
-# TODO: fix
-# @app.route("/staff_view_flights_customer/<string:flight_number>/<string:airline>/<string:dept_dt>")
-# def staff_view_flights_customer(flight_number, airline, dept_dt):
-#     _, s_logged = store_verify(session, customer_tokens, staff_tokens)
-#     if s_logged:
-#         dept_dt = "".join(dept_dt.split(" ")[0].split("-"))
-#
-#         headings, data = staff_view_flight_passengers(flight_number, airline, dept_dt, mysql)
-#
-#         if len(customers) > 0:
-#             result = True
-#         else:
-#             result = False
-#
-#         return render_template('staff_view_flights_customers.html', customers=customers, flight_number=flight_number, result=result)
-#
-#     return redirect(url_for("login")) THESE HAVE TO CHANGE, login doesn't exists anymore
+@app.route("/staff_view_flights_customer/<string:flight_number>/<string:airline>/<string:dept_dt>")
+def staff_view_flights_customer(flight_number, airline, dept_dt):
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        dept_dt = "".join(dept_dt.split(" ")[0].split("-"))
+
+        headings, data = staff_view_flight_passengers(flight_number, airline, dept_dt, mysql)
+
+        if len(data) > 0:
+            result = True
+        else:
+            result = False
+
+        return render_template('staff_view_flights_customers.html', headings=headings, customers=data, flight_number=flight_number, result=result)
+
+    return redirect(url_for("staff_login"))
 
 @app.route("/staff_create_flight")
 def staff_create_flight_view():

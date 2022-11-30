@@ -16,21 +16,17 @@
 <div class="cinput">
 {% if flights %}
     <h3>Results:</h3>
-      
+    
     <table>
+
         <tr>
-            <td>Flight Number</td>
-            <td>Airline</td>
-            <td>Airplane ID</td>
-            <td>Arrival</td>
-            <td>Departure</td>
-            <td>Base Price</td>
-            <td>Origin</td>
-            <td>Destination</td>
-            <td>Flight Status</td>
+            {%for heading in headings%}
+            <td>{{heading}}</td>
+            {%endfor%}
+            <td></td>
         </tr>
         {% for flight in flights%}
-        <tr>
+        <tr>  
             <td>
                 {{flight[0]}}
             </td>
