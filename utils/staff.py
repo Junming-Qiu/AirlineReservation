@@ -43,7 +43,7 @@ def staff_view_flight_all(AIRLINE: str, before, after, source, destination, s_ci
         sql += f" AND b.city = '{d_city}'"
 
     sql += ";"
-    print(sql)
+
     data = exec_sql(sql, mysql)
     headings =(
         'Flight Number',
