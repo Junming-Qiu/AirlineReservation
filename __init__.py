@@ -21,7 +21,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '***' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = '' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 
@@ -437,16 +437,53 @@ def staff_create_flight_submit():
             airplane_id = request.form['airplane_id']
             status = request.form['status']
         except:
-            return redirect(url_for('staff_create_flight'))
+            return redirect(url_for('staff_create_flight_view'))
 
         if not parse_input([flight_num, dept_time, arr_time, source, destination, base_price, airplane_id, status]):
-            return redirect(url_for('staff_create_flight'))
+            return redirect(url_for('staff_create_flight_view'))
 
         staff_create_flight(flight_num, airline, airplane_id, arr_time, dept_time, base_price, source, destination, status, mysql)
 
         return render_template("success.html", title='Airline Staff Add Flight', \
             message=f'Flight {flight_num} ({airplane_id}) departing at {dept_time} from {source} and arriving at {arr_time} in {destination} with price {base_price} and status {status}',\
                 next='/staff')
+
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_change_flight_status')
+def staff_change_flights():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+
+    if s_logged:
+        return render_template("staff_change_flight_status.html")
+
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_change_flight_status_submit', methods=['GET', 'POST'])
+def staff_change_flights_submit():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        flight_num = ""
+        dept_time = ""
+        status = ""
+
+        airline = session["employer"]
+
+        try:
+            flight_num = request.form['flight_num']
+            dept_time = request.form['dept_time']
+            status = request.form['status']
+
+        except:
+            return redirect(url_for("staff_change_flights"))
+
+        if not parse_input([flight_num, dept_time, status]):
+            return redirect(url_for("staff_change_flights"))
+
+        staff_update_flight_status(flight_num, airline, dept_time, status, mysql)
+
+        return render_template("success.html", title='Airline Staff Change Flight', \
+            message=f'Flight {flight_num} changed', next='/staff')
 
     return redirect(url_for("login_staff"))
 

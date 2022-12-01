@@ -61,8 +61,9 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
     alpha_lower = "abcdefghijklmnopqrstuvwxyz"
     alpha_upper = alpha_lower.capitalize()
     nums = "0123456789"
+    whitelist = ['-']
     restrict = ['\0', '\'', '\"', '\b', '\n', '\r', '\t', '\Z', '\\', '\%', '\_', \
-        '?', '-', '(', ')', '{', '}', '[', ']']
+        '?', '(', ')', '{', '}', '[', ']']
 
     for word in inputs:
         if word is None: # added this for optional params w/o input
@@ -71,16 +72,16 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
         if ispass:
             print("password", ' ' in word)
             if ' ' in word:
-                print(f"failed to parse {word}")
+                print(f"a. failed to parse {word}")
                 return False
 
             if len(word) <= 8:
-                print(f"failed to parse {word}")
+                print(f"b. failed to parse {word}")
                 return False
 
         for c in word:
-            if c not in alpha_lower and c not in alpha_upper and c not in nums and c in restrict:
-                print(f"failed to parse {word}")
+            if c not in alpha_lower and c not in alpha_upper and c not in nums and c not in whitelist and c in restrict:
+                print(f"c. failed to parse {c} in {word}", c not in alpha_lower, c not in alpha_upper, c not in nums, c not in whitelist, c in restrict)
                 return False
     print(f'Successfully parsed: {inputs}')
     return True

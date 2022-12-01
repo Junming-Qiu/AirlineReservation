@@ -4,7 +4,11 @@
 <div class="cinput">
     <h1>Public View Flights</h1>
         <form class="cinput" action="/public_view_flights" method="POST">
-			<input type="text" name = "flight_type" placeholder="'one way' OR 'two way'" required/> </br>
+            <label for="flight_type">Flight Type:</label>
+			<select type="text" name = "flight_type" id="flight_type" required>
+                <option value="one way">One Way</option>
+                <option value="two way">Two Way</option>
+            </select> </br>
 
             <input type="text" name = "city_origin" placeholder="city origin" /> </br>
             <input type="text" name = "city_dest" placeholder="city destination" /> </br>
