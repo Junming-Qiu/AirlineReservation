@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if is_customer %}
+
+    <form class="cinput"
+          action="/customer_confirm_delete/{{flight_data[0]}}/{{flight_data[1]}}/{{flight_data[2]}}/{{flight_data[3]}}"
+          method="POST">
+
+        <input type="submit" value = Confirm />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+       {% if confirmation %}
+            <p><strong>Success:</strong> {{confirmation}}</p>
+        {% endif %}
+    </form>
+
+{%else%}
+    <h3>No Results Found</h3>
+{%endif%}
+    <a href="/homepage_redirect">Go back</a>
+{%endblock%}

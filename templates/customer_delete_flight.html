@@ -2,8 +2,8 @@
 {%block content%}
 
 <div class="cinput">
-    <h1>Customer Purchase Flights</h1>
-        <form class="cinput" action="/customer_purchase_search_flights" method="POST">
+    <h1>Customer Delete Flights</h1>
+        <form class="cinput" action="/customer_delete_search_flights" method="POST">
 
             <input type="text" name = "city_origin" placeholder="city origin" /> </br>
             <input type="text" name = "city_dest" placeholder="city destination" /> </br>
@@ -37,7 +37,7 @@
             <td>{{ cell }}</td>
             {% endfor %}
             <td>
-                <a href="/customer_stage_purchase/{{row[2]}}/{{row[3]}}/{{row[4]}}/{{row[5]}}">Select to Purchase</a>
+                <a href="/customer_confirm_delete/{{row[0]}}">Cancel Flight</a>
             </td>
         </tr>
         {% endfor %}

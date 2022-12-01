@@ -491,8 +491,14 @@ def customer_search_flight():
 
 @app.route('/customer_init_purchase', methods=["POST", "GET"])
 def customer_init_purchase():
-    headings, data = public_view_oneway_flights(mysql)
-    return render_template('customer_purchase_flight.html', headings=headings, data=data)
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+
+        headings, data = public_view_oneway_flights(mysql)
+        return render_template('customer_purchase_flight.html', headings=headings, data=data)
+
+    return redirect(url_for('/login_customer'))
+
 
 # DOES NOT HANDLE two-way flights
 @app.route('/customer_purchase_search_flights', methods=["POST", "GET"])
@@ -585,6 +591,63 @@ def customer_confirm_purchase(flight_number, airline, dept_dt, base_price):
 
     return redirect(url_for("login_staff"))
 
+@app.route('/customer_init_delete', methods=["POST", "GET"])
+def customer_init_delete():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+
+        email = session['username']
+        headings, data = customer_view_my_flights(email, mysql)
+        return render_template('customer_delete_flight.html', headings=headings, data=data)
+
+    return redirect(url_for('/login_customer'))
+
+@app.route('/customer_delete_search_flights', methods=["POST", "GET"])
+def customer_delete_search_flights():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        c_org = None
+        c_dest = None
+        a_org = None
+        a_dest = None
+        dept_dt = None
+        return_dt = None
+        headings = []
+        data = []
+
+        try:
+            c_org = request.form['city_origin']
+            c_dest = request.form['city_dest']
+            a_org = request.form['airport_origin']
+            a_dest = request.form['airport_dest']
+            dept_dt = request.form['dept_dt']
+            return_dt = request.form['return_dt']
+        except:
+            pass
+
+        if not parse_input([c_org, c_dest, a_org, a_dest, dept_dt, return_dt]):
+            return render_template('customer_purchase_flight.html', headings=headings, data=data)
+
+        email = session['username']
+        headings, data = customer_view_my_flights(email, mysql, START_DATE=dept_dt, END_DATE=return_dt,
+                                                  AP_ORIGIN=a_org, AP_DEST=a_dest, CITY_ORIGIN=c_org, CITY_DEST=c_dest)
+        return render_template('customer_delete_flight.html', headings=headings, data=data)
+
+    return redirect(url_for("/login_customer"))
+
+
+
+# TODO: mysql integrity constraint.
+@app.route('/customer_confirm_delete/<string:ticket_id>',  methods=["POST", "GET"])
+def customer_confirm_delete(ticket_id):
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+
+        email = session['username']
+        customer_cancel_ticket(email, ticket_id, mysql)
+        return redirect(url_for("/customer_init_delete"))
+
+    return redirect(url_for("/login_staff"))
 
 
 app.secret_key = 'some key that you will never guess'

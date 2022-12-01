@@ -34,7 +34,7 @@ def customer_view_my_flights(EMAIL: str, mysql,
                              AP_ORIGIN=None, AP_DEST=None,
                              CITY_ORIGIN=None, CITY_DEST=None) ->  list[tuple]:
     sql = f'''
-    SELECT DISTINCT ap_origin.city, ap_dest.city,
+    SELECT DISTINCT t.id, ap_origin.city, ap_dest.city,
     f.flight_num, f.airline, f.dept_datetime, f.base_price {_my_flight_table(EMAIL)} '''
 
     if START_DATE: # NOT NULL
@@ -63,7 +63,8 @@ def customer_view_my_flights(EMAIL: str, mysql,
 
     sql += ';'
     data = exec_sql(sql, mysql)
-    headings = ('Origin',
+    headings = ('Ticket ID',
+                'Origin',
                 'Destination',
                 'Flight Number',
                 'Airline',
@@ -248,8 +249,6 @@ def customer_cancel_ticket(EMAIL: str, TID: str, mysql):
             raise Exception('Ticket already was cancelled')
     else:
         raise Exception('Ticket not associated with customer email')
-
-
 
 ### MAKE FLIGHT REVIEW / COMMENT ###
 
