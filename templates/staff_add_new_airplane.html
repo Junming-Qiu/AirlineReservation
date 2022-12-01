@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cinput">
+    <h1 class="textcenter">Airline Reservation System for Staff</h1>	
+    <h2>Add a New Flight</h2>
+
+    <form class="cinput" action="/staff_add_new_airplane_submit" method="POST">
+        
+        <input type="airplane_id" name="airplane_id" placeholder="Airplane ID"/>
+        <input type="num_seats" name="num_seats" placeholder="Number of Seats"/>
+        <input type="age" name="age" placeholder="Plane Age"/>
+        <input type="manufacturer" name="manufacturer" placeholder="Manufacturer"/>
+        <input type="submit" value="Submit"/>
+    </form>
+
+</div>
+
+
+
+{% endblock %}

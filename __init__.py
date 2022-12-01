@@ -487,7 +487,79 @@ def staff_change_flights_submit():
 
     return redirect(url_for("login_staff"))
 
+@app.route('/staff_add_new_airplane')
+def staff_add_new_airplane():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        return render_template("staff_add_new_airplane.html")
 
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_add_new_airplane_submit', methods=['GET', 'POST'])
+def staff_add_new_airplane_submit():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        airplane_id = ""
+        num_seats = ""
+        age = ""
+        manufacturer = ""
+        airline = session['employer']
+
+        try:
+            airplane_id = request.form['airplane_id']
+            num_seats = request.form['num_seats']
+            age = request.form['age']
+            manufacturer = request.form['manufacturer']
+        except:
+            return redirect(url_for("staff_add_new_airplane"))
+
+        if not parse_input([airplane_id, num_seats, age]):
+            return redirect(url_for("staff_add_new_airplane"))
+
+        staff_create_airplane(airplane_id, airline, num_seats, age, manufacturer, mysql)
+
+        return render_template('success.html', title="Airline Staff Add Airplane", \
+            message=f" Plane with ID: {airplane_id} has been added to {airline}",\
+                next='/staff')
+
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_add_new_airport')
+def staff_add_new_airport():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        return render_template("staff_add_new_airport.html")
+
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_add_new_airport_submit', methods=['GET', 'POST'])
+def staff_add_new_airport_submit():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        name = ""
+        city = ""
+        country = ""
+        airport_type = ""
+
+        try:
+            name = request.form['name']
+            city = request.form['city']
+            country = request.form['country']
+            airport_type = request.form['airport_type']
+        except:
+            return redirect(url_for("staff_add_new_airport"))
+        
+        if not parse_input([name, city, country, airport_type]):
+            return  redirect(url_for("staff_add_new_airport"))
+        
+        staff_create_airport(name, city, country, airport_type, mysql)
+
+        return render_template('success.html', title="Airline Staff Add Airplane",\
+            message=f"{airport_type} Airport {name} in {city}, {country} Added",\
+            next="/staff")
+
+
+    return redirect(url_for("login_staff"))
 
 ### CUSTOMER USE CASES ###
 @app.route('/customer_view_flight', methods=["POST", "GET"])
