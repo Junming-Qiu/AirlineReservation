@@ -113,7 +113,7 @@ create table purchase(
     card_number         varchar(20) not null,
     primary key (customer_email, ticket_id, card_number),
     foreign key (customer_email) references customer(email),
-    foreign key (ticket_id) references ticket(id),
+    foreign key (ticket_id) references ticket(id) ON DELETE CASCADE,
     foreign key (card_number) references card_info(card_number),
     constraint valid_price check (sold_price >= base_price)
 );

@@ -645,9 +645,9 @@ def customer_confirm_delete(ticket_id):
 
         email = session['username']
         customer_cancel_ticket(email, ticket_id, mysql)
-        return redirect(url_for("/customer_init_delete"))
+        return redirect(url_for("customer_init_delete"))
 
-    return redirect(url_for("/login_staff"))
+    return redirect(url_for("login_customer"))
 
 
 app.secret_key = 'some key that you will never guess'
