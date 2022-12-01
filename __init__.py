@@ -699,8 +699,59 @@ def customer_spending_year():
 
     return redirect(url_for('/login_customer'))
 
+@app.route('/customer_rate_and_comment', methods=["POST", "GET"])
+def customer_rate_and_comment():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+
+        email = session['username']
+        r_headings, r_data = customer_view_review(email, mysql)
+
+        today = date_in_X_days(0)
+        f_headings, f_data = customer_view_my_flights(email, mysql, END_DATE=today)
+
+        return render_template('customer_rate_and_comment.html',
+                                r_headings=r_headings, r_data=r_data,
+                                f_headings=f_headings, f_data=f_data)
+
+    return redirect(url_for('/login_customer'))
+
+@app.route('/customer_stage_rate_and_comment/<string:ticket_id>', methods=["POST", "GET"])
+def customer_stage_rate_and_comment(ticket_id):
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        return render_template('customer_stage_rate_and_comment.html', ticket_id=ticket_id)
+    return redirect(url_for("login_customer"))
 
 
+@app.route('/customer_create_rate_and_comment/<string:ticket_id>', methods=["POST", "GET"])
+def customer_create_rate_and_comment(ticket_id):
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        rating = None
+        comment = None
+
+        try:
+            rating = request.form['rating']
+            comment = request.form['comment']
+        except:
+            error = 'Bad Inputs'
+            return render_template('customer_stage_rate_and_comment.html', error=error)
+
+        if rating not in ['1','2','3','4','5']:
+            error = 'Rating must be 1-5'
+            return render_template('customer_stage_rate_and_comment.html', error=error)
+
+        if len(comment) > 400:
+            error = 'Comment cannot be more than 400 char'
+            return render_template('customer_stage_rate_and_comment.html', error=error)
+
+        email = session['username']
+        customer_create_review(email, ticket_id, rating, comment, mysql)
+
+        return redirect(url_for('customer_rate_and_comment'))
+
+    return redirect(url_for('/login_customer'))
 
 
 
