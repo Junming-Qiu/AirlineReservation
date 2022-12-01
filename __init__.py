@@ -21,7 +21,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'walrus123' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 
@@ -104,7 +104,7 @@ def login_customer():
 def customer():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
     if c_logged:
-        return render_template('customer.html', is_customer = True, username=session["username"])
+        return render_template('customer.html', is_customer=True, username=session["username"])
     return redirect(url_for("login_customer"))
 
 @app.route('/loginAuthCust', methods=['POST', 'GET'])
@@ -189,6 +189,10 @@ def registerAuthStaff():
         error = "Input Error"
         return render_template('register staff.html', error=error)
 
+    if not check_date_format(dob):
+        error = 'Date of Birth must be formate YYYY-MM-DD'
+        return render_template('register staff.html', error=error)
+
     # check if username exists
     if query_staff_username(username, mysql):
         error = f'Account with username {username} already exists'
@@ -203,7 +207,7 @@ def registerAuthStaff():
     create_staff_account(username, password, fname,
                          lname, dob, employer, mysql)
     # render homepage
-    return render_template('index.html')  # TODO: change to homepage
+    return redirect('/')
 
 
 
@@ -258,6 +262,10 @@ def registerAuthCustomer():
         error = "Input Error"
         return render_template('register customer.html', error=error)
 
+    if not check_date_format(dob):
+        error = 'Date of Birth must be formate YYYY-MM-DD'
+        return render_template('register customer.html', error=error)
+
     # check if email exists
     if query_customer_email(email, mysql):
         error = f'Account with email {email} already exists'
@@ -268,7 +276,7 @@ def registerAuthCustomer():
                             street,pp_country,pp_num,pp_expr,dob,phone_num, mysql)
 
     # render homepage
-    return render_template('index.html') #TODO: change to homepage
+    return redirect('/')
 
 
 
@@ -304,6 +312,9 @@ def public_view_flight():
     if not parse_input([c_org,c_dest,a_org,a_dest,dept_dt,return_dt,f_type]):
         return render_template('public_info.html', headings=headings, data=data)
 
+    if not check_datetime_format(dept_dt) and check_datetime_format(return_dt):
+        error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
+        return render_template('public_info.html', error=error)
 
     if f_type=='two way':
         headings, data = public_view_twoway_flights(mysql,CITY_ORIGIN=c_org,CITY_DEST=c_dest,AP_ORIGIN=a_org,
@@ -337,6 +348,10 @@ def public_check_status():
 
     if not parse_input([fnum,airline,dept_dt]):
         error = 'Bad inputs'
+        return render_template('public_status.html', error=error)
+
+    if not check_datetime_format(dept_dt):
+        error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
         return render_template('public_status.html', error=error)
 
     headings, data = public_view_flight_status(mysql, fnum, airline, dept_dt)
@@ -375,6 +390,10 @@ def staff_view_flights():
         if not parse_input([before, after, source, destination, s_city, d_city]):
             return render_template('staff_view_flights.html', flights=flights)
 
+        if not check_datetime_format(before) and check_datetime_format(after):
+            error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
+            return render_template('staff_view_flights.html', error=error)
+
         airline = session['employer']
         headings, flights = staff_view_flight_all(airline, before, after, source, destination, s_city, d_city, mysql)
 
@@ -387,7 +406,7 @@ def staff_view_flights():
 def staff_view_flights_customer(flight_number, airline, dept_dt):
     _, s_logged = store_verify(session, customer_tokens, staff_tokens)
     if s_logged:
-        dept_dt = "".join(dept_dt.split(" ")[0].split("-"))
+       # dept_dt = "".join(dept_dt.split(" ")[0].split("-"))
 
         headings, data = staff_view_flight_passengers(flight_number, airline, dept_dt, mysql)
 
@@ -442,6 +461,12 @@ def staff_create_flight_submit():
         if not parse_input([flight_num, dept_time, arr_time, source, destination, base_price, airplane_id, status]):
             return redirect(url_for('staff_create_flight_view'))
 
+        if not check_datetime_format(dept_time) and check_datetime_format(arr_time):
+            return redirect(url_for('staff_create_flight_view'))
+
+        if not check_datetime_format(dept_time) and check_datetime_format(arr_time):
+            return redirect(url_for('staff_create_flight_view'))
+
         staff_create_flight(flight_num, airline, airplane_id, arr_time, dept_time, base_price, source, destination, status, mysql)
 
         return render_template("success.html", title='Airline Staff Add Flight', \
@@ -464,7 +489,7 @@ def staff_change_flights_submit():
     _, s_logged = store_verify(session, customer_tokens, staff_tokens)
     if s_logged:
         flight_num = ""
-        dept_time = ""
+        dept_time = None
         status = ""
 
         airline = session["employer"]
@@ -478,6 +503,9 @@ def staff_change_flights_submit():
             return redirect(url_for("staff_change_flights"))
 
         if not parse_input([flight_num, dept_time, status]):
+            return redirect(url_for("staff_change_flights"))
+
+        if not check_datetime_format(dept_time):
             return redirect(url_for("staff_change_flights"))
 
         staff_update_flight_status(flight_num, airline, dept_time, status, mysql)
@@ -501,7 +529,7 @@ def staff_add_new_airplane_submit():
     if s_logged:
         airplane_id = ""
         num_seats = ""
-        age = ""
+        age = None
         manufacturer = ""
         airline = session['employer']
 
@@ -515,6 +543,9 @@ def staff_add_new_airplane_submit():
 
         if not parse_input([airplane_id, num_seats, age]):
             return redirect(url_for("staff_add_new_airplane"))
+
+        if not check_date_format(age):
+            redirect(url_for("staff_add_new_airplane"))
 
         staff_create_airplane(airplane_id, airline, num_seats, age, manufacturer, mysql)
 
@@ -587,6 +618,10 @@ def customer_view_flight():
         if not parse_input([s_date,e_date,a_org,a_dest,c_org,c_dest]):
             return render_template('customer_view_flights.html')
 
+        if not check_datetime_format(s_date) and check_datetime_format(e_date):
+            error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
+            return render_template('customer_view_flights.html', error=error)
+
         email = session['username']
         headings, data = customer_view_my_flights(email, mysql, START_DATE=s_date, END_DATE=e_date,
                                                AP_ORIGIN=a_org, AP_DEST=a_dest, CITY_ORIGIN=c_org, CITY_DEST=c_dest)
@@ -636,6 +671,9 @@ def customer_purchase_search_flights():
         if not parse_input([c_org, c_dest, a_org, a_dest, dept_dt, return_dt]):
             return render_template('customer_purchase_flight.html', headings=headings, data=data)
 
+        if not check_datetime_format(dept_dt) and check_datetime_format(return_dt):
+            error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
+            return render_template('customer_purchase_flight.html', headings=headings, data=data, error=error)
 
         headings, data = public_view_oneway_flights(mysql, CITY_ORIGIN=c_org, CITY_DEST=c_dest, AP_ORIGIN=a_org,
                                                     AP_DEST=a_dest, START_DATE=dept_dt, END_DATE=return_dt)
@@ -648,15 +686,15 @@ def customer_purchase_search_flights():
 def customer_stage_purchase(flight_number, airline, dept_dt, base_price):
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
     if c_logged:
-        clean_dt = dept_dt[0:4] + dept_dt[5:7] + dept_dt[8:10]
+        #clean_dt = dept_dt[0:4] + dept_dt[5:7] + dept_dt[8:10]
 
-        sp=get_sold_price(flight_number,airline,clean_dt,base_price,mysql)
+        sp=get_sold_price(flight_number,airline,dept_dt,base_price,mysql)
         if sp==None:
             error='Failed to purchase ticket. Flight capacity full.'
             return render_template('customer_stage_purchase.html', error=error)
         heading=('Final Price')
         data=(str(sp))
-        flight_data = [flight_number,airline,clean_dt,base_price,sp]
+        flight_data = [flight_number,airline,dept_dt,base_price,sp]
         return render_template('customer_stage_purchase.html', flight_data=flight_data, header=heading, data=data)
 
     return redirect(url_for("login_staff"))
@@ -737,6 +775,10 @@ def customer_delete_search_flights():
         if not parse_input([c_org, c_dest, a_org, a_dest, dept_dt, return_dt]):
             return render_template('customer_purchase_flight.html', headings=headings, data=data)
 
+        if not check_datetime_format(dept_dt) and check_datetime_format(return_dt):
+            error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
+            return render_template('customer_purchase_flight.html', headings=headings, data=data, error=error)
+
         email = session['username']
         headings, data = customer_view_my_flights(email, mysql, START_DATE=dept_dt, END_DATE=return_dt,
                                                   AP_ORIGIN=a_org, AP_DEST=a_dest, CITY_ORIGIN=c_org, CITY_DEST=c_dest)
@@ -768,8 +810,8 @@ def customer_spending():
 def customer_spending_search():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
     if c_logged:
-        s_date = date_in_X_days(-365)
-        e_date = date_in_X_days(0)
+        s_date = datetime_in_X_days(-365)
+        e_date = datetime_in_X_days(0)
 
         try:
             s_date = request.form['before']
@@ -779,6 +821,10 @@ def customer_spending_search():
 
         if not parse_input( [s_date, e_date] ):
             error = 'Bad Inputs'
+            return render_template('customer_spending.html', error=error)
+
+        if not check_datetime_format(s_date) and check_datetime_format(e_date):
+            error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
             return render_template('customer_spending.html', error=error)
 
         email = session['username']
@@ -816,7 +862,7 @@ def customer_rate_and_comment():
         email = session['username']
         r_headings, r_data = customer_view_review(email, mysql)
 
-        today = date_in_X_days(0)
+        today = datetime_in_X_days(0)
         f_headings, f_data = customer_view_my_flights(email, mysql, END_DATE=today)
 
         return render_template('customer_rate_and_comment.html',

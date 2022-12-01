@@ -13,14 +13,6 @@ General purpose functions.
 
 
 
-# DO NOT CALL OUTSIDE exec_sql()
-def _clean_rtn(rtn: tuple) -> tuple:
-    cleaned=[]
-    for t in rtn:
-        cleaned.append(tuple([t[i] for i in range(len(t-1))]))
-    return tuple(cleaned)
-
-
 # execute a sql statement, return a tuple of tuples corresponding to rows in a table
 def exec_sql(sql: str, mysql, commit=False) -> tuple:
     cur = mysql.connection.cursor()
@@ -40,20 +32,46 @@ def encrypt_password(password: str) -> str:
     hash_object = hashlib.md5(password.encode())
     return hash_object.hexdigest()
 
-
-# make sure that datetime is in a MYSQL-friendly format
-def check_datetime_format(DATE: str) -> None: # TODO : make sure all date times are okay
-    try:
-        datetime.datetime.strptime(DATE, '%Y%m%d %H%M%S')
-    except ValueError:
-        raise ValueError(f'Incorrect date format {DATE}, must be YYYYMMDD HHMMSS')
-
 # return the date X days from today
 def date_in_X_days(NUM_DAYS: int) -> str:
+    '''
+    :param NUM_DAYS: number of days different from current datetime
+    :return: 'YYYY-MM-DD'
+    '''
     today_plus_X = str(datetime.date.today() + datetime.timedelta(days=NUM_DAYS))
-    time_str = today_plus_X[0:4] + today_plus_X[5:7] + today_plus_X[8:10] #+ ' 000000' # TODO: fix this formatting
-    #check_datetime_format(time_str) # TODO: fix this formatting
-    return time_str
+    return today_plus_X
+
+def datetime_in_X_days(NUM_DAYS: int) -> str:
+    '''
+    :param NUM_DAYS: number of days different from current datetime
+    :return: 'YYYY-MM-DD HH:MM:SS'
+    '''
+    today_plus_X = str(datetime.datetime.today() + datetime.timedelta(days=NUM_DAYS))[0:-7]
+    return today_plus_X
+
+
+def check_datetime_format(DATETIME: str) -> bool:
+    if DATETIME is None:
+        return True
+
+    try:
+        datetime.datetime.strptime(DATETIME, '%Y-%m-%d %H:%M:%S')
+        return True
+    except:
+        return False
+
+
+def check_date_format(DATE: str) -> bool:
+    if DATE is None:
+        return True
+
+    try:
+        datetime.datetime.strptime(DATE, '%Y-%m-%d')
+        return True
+    except:
+        return False
+
+
 
 # Takes many works and checks that they are valid as a group
 def parse_input(inputs: list[str], ispass=False) -> bool:

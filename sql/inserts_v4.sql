@@ -31,26 +31,26 @@ insert into staff_phone_num values
     ('kbennit283','212-235-9924');
 
 insert into flight values
-    ('BA2491A', 'JetBlue', 'Xqts-cOKP-BRGn-AXMn', '2022-12-05',
-        '2022-12-04', 934.63, 'JFK', 'PVG', 'on time'),
+    ('BA2491A', 'JetBlue', 'Xqts-cOKP-BRGn-AXMn', '2022-12-05 08:30:00',
+        '2022-12-04 12:00:00', 934.63, 'JFK', 'PVG', 'on time'),
 
-    ('BA6492B', 'JetBlue', 'APHQ-enfB-uRrT-lMzD', '2022-11-05',
-    '2022-12-05', 765.35, 'JFK', 'PVG', 'delayed'),
+    ('BA6492B', 'JetBlue', 'APHQ-enfB-uRrT-lMzD', '2022-11-05 12:00:00',
+    '2022-12-05 08:30:00', 765.35, 'JFK', 'PVG', 'delayed'),
 
-    ('AA3181A', 'JetBlue', 'fXgM-uGTn-fUkL-VZQX', '2022-10-29',
-    '2022-10-29', 334.33, 'JFK', 'PVG', 'on time'),
+    ('AA3181A', 'JetBlue', 'fXgM-uGTn-fUkL-VZQX', '2022-10-29 12:00:00',
+    '2022-10-29 12:00:00', 334.33, 'JFK', 'PVG', 'on time'),
 
-    ('AA4421A', 'JetBlue', 'APHQ-enfB-uRrT-lMzD', '2022-11-13',
-    '2022-11-12', 484.20, 'PVG', 'JFK', 'delayed'),
+    ('AA4421A', 'JetBlue', 'APHQ-enfB-uRrT-lMzD', '2022-11-13 12:00:00',
+    '2022-11-12 08:30:00', 484.20, 'PVG', 'JFK', 'delayed'),
 
-    ('CA4441B', 'JetBlue', 'Xqts-cOKP-BRGn-AXMn', '2022-11-26',
-    '2022-11-25', 1034.74,'PVG', 'JFK', 'on time');
+    ('CA4441B', 'JetBlue', 'Xqts-cOKP-BRGn-AXMn', '2022-11-26 12:00:00',
+    '2022-11-25 08:30:00', 1034.74,'PVG', 'JFK', 'on time');
 
 insert into ticket values
-('00001','AA3181A','JetBlue','2022-10-29'),
-('00002','CA4441B','JetBlue','2022-11-25'),
-('00003','AA3181A','JetBlue','2022-10-29'),
-('00004','BA6492B','JetBlue','2022-12-05');
+('00001','AA3181A','JetBlue','2022-10-29 12:00:00'),
+('00002','CA4441B','JetBlue','2022-11-25 08:30:00'),
+('00003','AA3181A','JetBlue','2022-10-29 12:00:00'),
+('00004','BA6492B','JetBlue','2022-12-05 08:30:00');
 
 insert into card_info values
 ('4172926778282996','11/26','Sol Sharp','credit'),
@@ -58,10 +58,10 @@ insert into card_info values
 ('6011119001783002','5/25','Ava Knox','debit');
 
 insert into purchase values
-('sharp242@gmail.com', '00001', '2022-09-18', 520.34, 334.33,'4172926778282996'),
-('jj223@gmail.com', '00002', '2022-09-13', 1052.59, 1034.74, '5344773531817134'),
-('unhackable@gmail.com', '00003', '2022-09-29', 562.23, 334.33,'6011119001783002'),
-('unhackable@gmail.com', '00004', '2022-10-03', 803.18, 765.35, '6011119001783002');
+('sharp242@gmail.com', '00001', '2022-09-18 12:00:00', 520.34, 334.33,'4172926778282996'),
+('jj223@gmail.com', '00002', '2022-09-13 12:00:00', 1052.59, 1034.74, '5344773531817134'),
+('unhackable@gmail.com', '00003', '2022-09-29 12:00:00', 562.23, 334.33,'6011119001783002'),
+('unhackable@gmail.com', '00004', '2022-10-03 12:00:00', 803.18, 765.35, '6011119001783002');
 
 
 

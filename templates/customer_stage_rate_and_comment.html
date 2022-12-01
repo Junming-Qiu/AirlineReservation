@@ -6,8 +6,8 @@
 <div class="cinput">
     <h1>Customer View Flights</h1>
     <form class="cinput" action="/customer_create_rate_and_comment/{{ ticket_id }}" method="POST">
-        <input type="rating" name="rating" placeholder="Rating 1-5"/>
-        <input type="comment" name="comment" placeholder="Max comment length is 400 char"/>
+        <input type="rating" name="rating" placeholder="Rating 1-5" required/>
+        <input type="comment" name="comment" placeholder="Max comment length is 400 char" required/>
         <input type="submit" value="Submit"/>
 
         {% if error %}

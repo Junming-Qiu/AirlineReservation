@@ -5,8 +5,8 @@
     <h2>Change Flight Status for {{airline}}</h2>
     <form class="cinput" action="/staff_change_flight_status_submit" method="POST">
     
-        <input type="flight_num" name="flight_num" placeholder="Flight Number"/>
-        <input type="dept_time" name="dept_time" placeholder="Departure Time"/>
+        <input type="flight_num" name="flight_num" placeholder="Flight Number" required/>
+        <input type="dept_time" name="dept_time" placeholder="Departure datetime YYYY-MM-DD HH:MM:SS" required/>
         <div>
             <label for="status">Status: </label>
             <select name="status" id="status" placeholder="Status">

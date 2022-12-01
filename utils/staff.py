@@ -14,10 +14,10 @@ NOTE : these functions do not ensure that the
 def staff_view_flight_all(AIRLINE: str, before, after, source, destination, s_city, d_city, mysql) -> tuple:
     # Must be checking for none, otherwise an empty form will set default to 30 days after today
     if before == None:
-        before = date_in_X_days(0)
+        before = datetime_in_X_days(0)
 
     if after == None:
-        after = date_in_X_days(30)
+        after = datetime_in_X_days(30)
 
     sql = f'''
         SELECT f.flight_num, f.airline, f.airplane_id,
@@ -28,7 +28,7 @@ def staff_view_flight_all(AIRLINE: str, before, after, source, destination, s_ci
     '''
 
     if before and after:
-        sql += f" AND f.dept_datetime BETWEEN {before} AND {after}"
+        sql += f" AND f.dept_datetime BETWEEN '{before}' AND '{after}'"
 
     if source:
         sql += f" AND f.origin = '{source}'"
@@ -66,7 +66,7 @@ def staff_view_flight_passengers(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -
         AND p.ticket_id = t.id
         AND t.flight_num = '{FNUM}'
         AND t.airline = '{AIRLINE}'
-        AND t.dept_datetime = {DEPT_DT};
+        AND t.dept_datetime = '{DEPT_DT}';
     '''
 
     data = exec_sql(sql, mysql)
@@ -85,8 +85,8 @@ def staff_create_flight(FNUM: str, AIRLINE: str, AIRPLANE_ID: str,
                             ORGN: str, DEST: str, FSTAUS: str, mysql) -> None:
     sql=f'''
     INSERT INTO flight
-    VALUES('{FNUM}', '{AIRLINE}', '{AIRPLANE_ID}', {ARRV_DT},
-           {DEPT_DT}, {BASE_PRICE}, '{ORGN}', '{DEST}', '{FSTAUS}');
+    VALUES('{FNUM}', '{AIRLINE}', '{AIRPLANE_ID}', '{ARRV_DT}',
+           '{DEPT_DT}', {BASE_PRICE}, '{ORGN}', '{DEST}', '{FSTAUS}');
     '''
     exec_sql(sql, mysql, commit=True)
 
@@ -100,7 +100,7 @@ def staff_update_flight_status(FNUM: str, AIRLINE: str,
         SET flight_status='{STATUS}' 
         WHERE flight_num='{FNUM}'
             AND airline='{AIRLINE}'
-            AND dept_datetime={DEPT_DT};
+            AND dept_datetime='{DEPT_DT}';
     '''
     exec_sql(sql, mysql, commit=True)
 
@@ -182,7 +182,7 @@ def staff_view_mfc_range(START: str, END: str, mysql) -> tuple:
     FROM
         (SELECT customer_email, count(*) as num
         FROM purchase
-        WHERE purchase_datetime BETWEEEN {START} AND {END}
+        WHERE purchase_datetime BETWEEEN '{START}' AND '{END}'
         GROUP BY customer_email) as tmp
 
         JOIN customer as c
@@ -199,23 +199,16 @@ def staff_view_mfc_range(START: str, END: str, mysql) -> tuple:
     )
     return (headings,data)
 
-def staff_view_mfc_pastmonth() -> tuple:
-    first = str(datetime.today().date().replace(day=1))
-    start = first[0:4] + first[5:7] + first[8:10]
+def staff_view_mfc_pastmonth1() -> tuple:
+    today = datetime.datetime.today()
+    past_month = today.replace(month=(today.month-1))
+    return staff_view_mfc_range(str(past_month)[0:-7], str(today)[0:-7])
 
-    today = str(datetime.date.today())
-    end = today[0:4] + today[5:7] + today[8:10]
-
-    return staff_view_mfc_range(start, end)
 
 def staff_view_mfc_pastyear() -> tuple:
-    first = str(datetime.today().date().replace(day=1, month=1))
-    start = first[0:4] + first[5:7] + first[8:10]
-
-    today = str(datetime.date.today())
-    end = today[0:4] + today[5:7] + today[8:10]
-
-    return staff_view_mfc_range(start, end)
+    today = datetime.datetime.today()
+    past_year = today.replace(year=(today.year-1))
+    return staff_view_mfc_range(str(past_year)[0:-7], str(today)[0:-7])
 
 def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql) -> tuple:
     sql = f'''
@@ -225,7 +218,8 @@ def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql) -> tuple
         SELECT ticket_id
         FROM purchase
         WHERE customer_email='{EMAIL}'
-        );
+        )
+        AND airline = '{AIRLINE}' ;
     '''
     data = exec_sql(sql, mysql)
     headings=(
@@ -243,30 +237,21 @@ def staff_view_tickets_sold_range(START: str, END: str, AIRLINE: str, mysql) -> 
     SELECT count(*) as ticket_sold
     FROM ticket as t JOIN purchase as p ON t.id=p.ticket_id
     WHERE t.airline='{AIRLINE}'
-        AND p.purchase_datetime BETWEEN {START} AND {END}
+        AND p.purchase_datetime BETWEEN '{START}' AND '{END}'
     '''
     data = exec_sql(sql, mysql)
     headings=('Num Tickets')
     return (headings,data)
 
-def staff_view_tickets_sold_pastmonth(AIRLINE: str, mysqlL) -> tuple:
-    first = str(datetime.today().date().replace(day=1))
-    month_start = first[0:4] + first[5:7] + first[8:10]
-
-    today = str(datetime.date.today())
-    end = today[0:4] + today[5:7] + today[8:10]
-
-    return staff_view_tickets_sold_range(month_start, end, AIRLINE)
+def staff_view_tickets_sold_pastmonth(AIRLINE: str, mysql) -> tuple:
+    today = datetime.datetime.today()
+    past_month = today.replace(month=(today.month - 1))
+    return staff_view_mfc_range(str(past_month)[0:-7], str(today)[0:-7], AIRLINE, mysql)
 
 def staff_view_tickets_sold_pastyear(AIRLINE: str, mysql) -> tuple:
-    first = str(datetime.today().date().replace(day=1, month=1))
-    year_start = first[0:4] + first[5:7] + first[8:10]
-
-    today = str(datetime.date.today())
-    end = today[0:4] + today[5:7] + today[8:10]
-
-    return staff_view_tickets_sold_range(year_start, end, AIRLINE)
-
+    today = datetime.datetime.today()
+    past_year = today.replace(year=(today.year - 1))
+    return staff_view_mfc_range(str(past_year)[0:-7], str(today)[0:-7], AIRLINE, mysql)
 
 
 # USE CASE 8: view revenue
@@ -275,32 +260,22 @@ def staff_view_revenue_range(START: str, END: str, AIRLINE: str, mysql) -> tuple
     SELECT sum(p.sold_price) as revenue
     FROM ticket as t JOIN purchase as p ON t.id=p.ticket_id
     WHERE t.airline='{AIRLINE}'
-        AND p.purchase_datetime BETWEEN {START} AND {END}
+        AND p.purchase_datetime BETWEEN '{START}' AND '{END}'
     '''
     data = exec_sql(sql, mysql)
     headings=('Revenue')
     return (headings,data)
 
 def staff_view_revenue_pastmonth(AIRLINE: str, mysql) ->  tuple:
-    first = str(datetime.today().date().replace(day=1))
-    month_start = first[0:4] + first[5:7] + first[8:10]
+    today = datetime.datetime.today()
+    past_month = today.replace(month=(today.month - 1))
+    return staff_view_revenue_range(str(past_month)[0:-7], str(today)[0:-7], AIRLINE, mysql)
 
-    today = str(datetime.date.today())
-    end = today[0:4] + today[5:7] + today[8:10]
-
-    return staff_view_revenue_range(month_start, end, AIRLINE, mysql)
 
 def staff_view_revenue_pastyear(AIRLINE: str, mysql) ->  tuple:
-    first = str(datetime.today().date().replace(day=1, month=1))
-    year_start = first[0:4] + first[5:7] + first[8:10]
-
-    today = str(datetime.date.today())
-    end = today[0:4] + today[5:7] + today[8:10]
-
-    return staff_view_revenue_range(year_start, end, AIRLINE)
-
-
-
+    today = datetime.datetime.today()
+    past_year = today.replace(year=(today.year - 1))
+    return staff_view_revenue_range(str(past_year)[0:-7], str(today)[0:-7], AIRLINE, mysql)
 
 
 # HELPERS

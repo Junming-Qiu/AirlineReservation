@@ -11,7 +11,7 @@ create table airline_staff(
     password        varchar(40) not null,
     fname           varchar(20) not null,
     lname           varchar(20) not null,
-    dob             timestamp not null,
+    dob             date not null,
     employer        varchar(20) not null,
     primary key (username),
     foreign key (employer) references airline(name)
@@ -42,7 +42,7 @@ create table airplane(
     id              varchar(20) not null,
     airline         varchar(20) not null,
     num_seats       int not null,
-    age             timestamp not null,
+    age             date not null,
     manufacturer    varchar(20) not null,
     primary key (id, airline),
     foreign  key (airline) references airline(name)
@@ -52,8 +52,8 @@ create table flight(
      flight_num         varchar(20) not null,
      airline            varchar(20) not null,
      airplane_id        varchar(20) not null,
-     arrv_datetime   	timestamp not null,
-     dept_datetime   	timestamp not null,
+     arrv_datetime   	datetime not null,
+     dept_datetime   	datetime not null,
      base_price         float not null,
      origin             varchar(20) not null,
      destination        varchar(20) not null,
@@ -73,7 +73,7 @@ create table ticket(
     id              varchar(20) not null,
     flight_num      varchar(20) not null,
     airline         varchar(20) not null,
-    dept_datetime	timestamp not null,
+    dept_datetime	datetime not null,
     primary key (id),
     foreign key (flight_num, airline, dept_datetime)
 		references flight(flight_num, airline, dept_datetime)
@@ -88,15 +88,15 @@ create table customer(
     street          varchar(20) not null,
     pp_country      varchar(20) not null,
     pp_num          varchar(20) not null,
-    pp_exper        timestamp not null,
-    dob             timestamp not null,
+    pp_exper        date not null,
+    dob             date not null,
     phone_number    varchar(20) not null,
     primary key (email)
 );
 
 create table card_info(
     card_number     varchar(20) not null,
-    card_exper      varchar(20) not null,
+    card_expr      varchar(20) not null,
     name_on_card    varchar(20) not null,
     card_type       varchar(20) not null,
     primary key (card_number),
@@ -107,7 +107,7 @@ create table card_info(
 create table purchase(
     customer_email      varchar(20) not null,
     ticket_id           varchar(20) not null,
-    purchase_datetime   timestamp not null,
+    purchase_datetime   datetime not null,
     sold_price          float not null,
     base_price          float not null references flight(base_price),
     card_number         varchar(20) not null,

@@ -49,15 +49,15 @@ def public_view_twoway_flights(mysql, START_DATE=None, END_DATE=None,
             AND f1.arrv_datetime>f2.dept_datetime'''
     if START_DATE:  # NOT NULL
         sql += f'''
-        AND f1.dept_datetime>={START_DATE}'''                                                                              # TODO: should this be range or exact date?
+        AND f1.dept_datetime>='{START_DATE}' '''                                                                              # TODO: should this be range or exact date?
     else:
-        today = date_in_X_days(0)
+        today = datetime_in_X_days(0)
         sql+=f'''
-        AND f1.dept_datetime>={today}'''
+        AND f1.dept_datetime>='{today}' '''
 
     if END_DATE:
         sql += f'''
-        AND f2.dept_datetime<={END_DATE} '''
+        AND f2.dept_datetime<='{END_DATE}' '''
 
     if AP_ORIGIN:
         sql += f'''
@@ -101,15 +101,15 @@ def public_view_oneway_flights(mysql, START_DATE=None, END_DATE=None,
 
     if START_DATE: # NOT NULL
         sql+=f'''
-        AND f.dept_datetime>={START_DATE}'''                                                                              # TODO: should this be range or exact date?
+        AND f.dept_datetime>='{START_DATE}' '''                                                                              # TODO: should this be range or exact date?
     else:
-        today = date_in_X_days(0)
+        today = datetime_in_X_days(0)
         sql+=f'''
-        AND f.dept_datetime>={today}'''
+        AND f.dept_datetime>='{today}' '''
 
     if END_DATE:
         sql+=f'''
-        AND f.dept_datetime<={END_DATE} '''
+        AND f.dept_datetime<='{END_DATE}' '''
 
     if AP_ORIGIN:
         sql+=f'''
@@ -144,7 +144,7 @@ def public_view_flight_status(mysql, FLIGHT_NUM, AIRLINE, DEPT_DT) -> tuple:
     FROM flight as f
     WHERE f.flight_num='{FLIGHT_NUM}'
         AND f.airline='{AIRLINE}'
-        AND f.dept_datetime={DEPT_DT};
+        AND f.dept_datetime='{DEPT_DT}';
     '''
     data=exec_sql(sql,mysql)
     headings=(

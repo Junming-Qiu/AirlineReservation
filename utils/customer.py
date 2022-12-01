@@ -6,8 +6,6 @@ import string
 
 CUSTOMER EXCLUSIVE FUNCTIONS
 
-
-
 '''
 
 
@@ -39,11 +37,11 @@ def customer_view_my_flights(EMAIL: str, mysql,
 
     if START_DATE: # NOT NULL
         sql+=f'''
-        AND f.dept_datetime>={START_DATE}'''                                                                                   # TODO, should this be =?
+        AND f.dept_datetime>='{START_DATE}' '''                                                                                   # TODO, should this be =?
 
     if END_DATE:
         sql+=f'''
-        AND f.dept_datetime<={END_DATE} '''
+        AND f.dept_datetime<='{END_DATE}' '''
 
     if AP_ORIGIN:
         sql+=f'''
@@ -96,7 +94,7 @@ def _create_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql) -> str:
     tid=_generate_ticket_id(mysql)
     sql=f'''
     INSERT INTO ticket
-    VALUES ('{tid}','{FNUM}','{AIRLINE}',{DEPT_DT});'''
+    VALUES ('{tid}','{FNUM}','{AIRLINE}','{DEPT_DT}');'''
     exec_sql(sql,mysql,commit=True)
     return tid
 
@@ -129,7 +127,7 @@ def _create_purchase(EMAIL: str, TID: str, PURCHASE_DT: str, SOLD_PRICE: str,
 
     sql=f'''
     INSERT INTO purchase
-    VALUES ('{EMAIL}','{TID}',{PURCHASE_DT},{SOLD_PRICE},{BASE_PRICE},'{CARD_NUM}');
+    VALUES ('{EMAIL}','{TID}','{PURCHASE_DT}',{SOLD_PRICE},{BASE_PRICE},'{CARD_NUM}');
     '''
     exec_sql(sql, mysql, commit=True)
     
@@ -144,7 +142,7 @@ def get_sold_price(FNUM: str, AIRLINE: str, DEPT_DT: str,
                 ON ap.id = f.airplane_id
             WHERE f.flight_num = '{FNUM}'
              AND f.airline = '{AIRLINE}'
-             AND f.dept_datetime = {DEPT_DT};
+             AND f.dept_datetime = '{DEPT_DT}';
             '''
     try:
         capacity = exec_sql(sql, mysql)[0][0]
@@ -161,7 +159,7 @@ def get_sold_price(FNUM: str, AIRLINE: str, DEPT_DT: str,
             GROUP BY t.flight_num, t.airline, t.dept_datetime
             HAVING t.flight_num = '{FNUM}'
              AND t.airline = '{AIRLINE}'
-             AND t.dept_datetime = {DEPT_DT};
+             AND t.dept_datetime = '{DEPT_DT}';
             '''
     try:
         tickets_sold = exec_sql(sql, mysql)[0][0]
@@ -185,7 +183,7 @@ def get_base_price(FNUM: str, AIRLINE: str, DEPT_DT: str, mysql):
     FROM flight
     WHERE flight_num='{FNUM}'
         AND airline='{AIRLINE}'
-        AND dept_datetime={DEPT_DT};
+        AND dept_datetime='{DEPT_DT}';
     '''
     return exec_sql(sql, mysql)[0][0]
 
@@ -208,7 +206,7 @@ def customer_purchase_ticket(FNUM: str, AIRLINE: str, DEPT_DT: str,         # fl
 
 
     # 3. make purchase
-    today = date_in_X_days(0)
+    today = datetime_in_X_days(0)
     _create_purchase(EMAIL, ticket_id, today, SPRICE, BPRICE, CNUM, mysql)
 
 
@@ -299,7 +297,7 @@ def customer_view_spending_interval(EMAIL: str, START: str, END: str, mysql) -> 
     sql=f'''
     SELECT sum(sold_price)
     FROM purchase
-    WHERE purchase_datetime BETWEEN {START} AND {END}
+    WHERE purchase_datetime BETWEEN '{START}' AND '{END}'
     GROUP BY customer_email
     HAVING customer_email='{EMAIL}';
     '''
@@ -313,13 +311,13 @@ def customer_view_spending_interval(EMAIL: str, START: str, END: str, mysql) -> 
 
 # sum spending in the past 6 months
 def customer_view_spending_past6months(EMAIL: str, mysql) -> tuple:
-    start = date_in_X_days(-183)
-    end = date_in_X_days(0)
+    start = datetime_in_X_days(-183)
+    end = datetime_in_X_days(0)
     return customer_view_spending_interval(EMAIL, start, end, mysql)
 
 
 # sum spending in the past year
 def customer_view_spending_pastyear(EMAIL: str, mysql) -> tuple:
-    start = date_in_X_days(-365)
-    end = date_in_X_days(0)
+    start = datetime_in_X_days(-365)
+    end = datetime_in_X_days(0)
     return customer_view_spending_interval(EMAIL, start, end, mysql)
