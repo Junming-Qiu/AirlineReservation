@@ -1,0 +1,43 @@
+{%extends "base.html"%}
+{%block content%}
+
+<div class="cinput">
+    <h1>Customer View Spending</h1>
+        <form class="cinput"
+              action="/customer_spending_search"
+              method="POST">
+
+            <input type="before" name="before" placeholder="Date 1 YYYYMMDD"/>
+            <input type="after" name="after" placeholder="Date 2 YYYYMMDD"/>
+
+			<input type="submit" value = Search-Range />
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+		</form>
+        <form class="cinput"
+              action="/customer_spending_6months"
+              method="POST">
+            <input type="submit" value = Search-6-Months />
+        </form>
+                <form class="cinput"
+              action="/customer_spending_year"
+              method="POST">
+            <input type="submit" value = Search-1-Year />
+        </form>
+</div>
+<div class="cinput">
+    <table>
+        <tr>
+            <th>{{ header }}</th>
+        </tr>
+
+        <tr>
+            <th>{{ data }}</th>
+        </tr>
+    </table>
+
+    <a href="/homepage_redirect">Go back</a>
+
+{%endblock%}
+

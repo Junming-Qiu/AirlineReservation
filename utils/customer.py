@@ -287,10 +287,13 @@ def customer_view_spending_interval(EMAIL: str, START: str, END: str, mysql) -> 
     FROM purchase
     WHERE purchase_datetime BETWEEN {START} AND {END}
     GROUP BY customer_email
-    HAVING customer_email={EMAIL};
+    HAVING customer_email='{EMAIL}';
     '''
-    data=exec_sql(sql, mysql)
-    headings={'Spending'}
+    try:
+        data=exec_sql(sql, mysql)[0][0]
+    except:
+        data='0'
+    headings='Spending'
     return (headings,data)
 
 

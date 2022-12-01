@@ -635,9 +635,6 @@ def customer_delete_search_flights():
 
     return redirect(url_for("/login_customer"))
 
-
-
-# TODO: mysql integrity constraint.
 @app.route('/customer_confirm_delete/<string:ticket_id>',  methods=["POST", "GET"])
 def customer_confirm_delete(ticket_id):
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
@@ -648,6 +645,65 @@ def customer_confirm_delete(ticket_id):
         return redirect(url_for("customer_init_delete"))
 
     return redirect(url_for("login_customer"))
+
+@app.route('/customer_spending',  methods=["POST", "GET"])
+def customer_spending():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        email = session['username']
+        headings, data = customer_view_spending_pastyear(email, mysql)
+        return render_template('customer_spending.html', headings=headings, data=data)
+
+    return redirect(url_for('/login_customer'))
+@app.route('/customer_spending_search',  methods=["POST", "GET"])
+def customer_spending_search():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        s_date = date_in_X_days(-365)
+        e_date = date_in_X_days(0)
+
+        try:
+            s_date = request.form['before']
+            e_date = request.form['after']
+        except:
+            pass
+
+        if not parse_input( [s_date, e_date] ):
+            error = 'Bad Inputs'
+            return render_template('customer_spending.html', error=error)
+
+        email = session['username']
+        headings, data = customer_view_spending_interval(email, s_date, e_date, mysql)
+        return render_template('customer_spending.html', headings=headings, data=data)
+
+    return redirect(url_for('/login_customer'))
+
+@app.route('/customer_spending_6months',  methods=["POST", "GET"])
+def customer_spending_6months():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+
+        email = session['username']
+        headings, data = customer_view_spending_past6months(email, mysql)
+        return render_template('customer_spending.html', headings=headings, data=data)
+
+    return redirect(url_for('/login_customer'))
+
+@app.route('/customer_spending_year', methods=["POST", "GET"])
+def customer_spending_year():
+    c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
+    if c_logged:
+        email = session['username']
+        headings, data = customer_view_spending_pastyear(email, mysql)
+        return render_template('customer_spending.html', headings=headings, data=data)
+
+    return redirect(url_for('/login_customer'))
+
+
+
+
+
+
 
 
 app.secret_key = 'some key that you will never guess'
