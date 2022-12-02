@@ -21,7 +21,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'walrus123' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = '' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 
@@ -591,6 +591,42 @@ def staff_add_new_airport_submit():
 
 
     return redirect(url_for("login_staff"))
+
+@app.route('/staff_view_flight_ratings', methods=['GET', 'POST'])
+def staff_view_flight_ratings():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        flight_num = ""
+        dept_time = ""
+        airline = session['employer']
+
+        try:
+            flight_num = request.form['flight_num']
+            dept_time = request.form['dept_time']
+        except:
+            #Allow empty fields through
+            pass
+
+        if not parse_input([flight_num, dept_time]):
+            return redirect(url_for('/staff'))
+
+        headings, ratings = staff_view_avg_rating(flight_num, airline, dept_time, mysql)
+
+        return render_template("staff_view_flight_ratings.html", headings=headings, ratings=ratings, airline=airline)
+
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_view_ratings_and_comments/<string:flight_num>/<string:dept_time>')
+def staff_view_ratings_and_comments_view(flight_num, dept_time):
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        airline = session['employer']
+
+        headings, reviews = staff_view_ratings_and_comments(flight_num, airline, dept_time, mysql)
+        return render_template('staff_view_ratings_and_comments.html', headings=headings, reviews=reviews, flight_num=flight_num)
+
+    return redirect(url_for("login_staff"))
+
 
 ### CUSTOMER USE CASES ###
 @app.route('/customer_view_flight', methods=["POST", "GET"])

@@ -1,0 +1,35 @@
+{%extends "base.html"%}
+{%block content%}
+<div class="cinput">
+    <h1>Airline Reservation System for Staff</h1>
+    <h2>View Flight Ratings and Comments for Flight: {{flight_num}}</h2>
+
+    {%if reviews%}
+        <table>
+            <tr>
+                {%for heading in headings%}
+                <td>{{heading}}</td>
+                {%endfor%}
+
+            </tr>
+
+            {%for review in reviews%}
+            <tr>  
+                <td>
+                    {{review[0]}}
+                </td>
+                <td>
+                    {{review[1]}}
+                </td>    
+            </tr>
+
+            {%endfor%}
+        </table>
+    {%else%}
+        <h3>No Results Found</h3>
+    {%endif%}
+
+    <a href="/staff">Back</a>
+</div>
+
+{%endblock%}

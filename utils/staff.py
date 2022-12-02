@@ -143,17 +143,32 @@ def staff_create_airport(NAME: str, CITY: str, COUNTRY: str, TYPE: str, mysql) -
 
 
 # USE CASE 6: view  flight rating and comments
+# Defaults to showing all flights before today for this airline
 def staff_view_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mysql) -> tuple:
+
     sql = f'''
-    SELECT avg(f.rating)
+    SELECT t.flight_num, t.dept_datetime ,avg(f.rating)
     FROM flight_review as f join ticket as t on f.ticket_id = t.id
     GROUP BY t.flight_num, t.airline, t.dept_datetime
-    HAVING t.flight_num = '{FLIGHT_NUM}'
-        AND t.airline = '{AIRLINE}'
-        AND t.dept_datetime = '{DEPT_DATETIME}';
+    HAVING t.airline = '{AIRLINE}'
     '''
+
+    if FLIGHT_NUM:
+        sql += f" AND t.flight_num = '{FLIGHT_NUM}'"
+
+    if not FLIGHT_NUM and not DEPT_DATETIME:
+        DEPT_DATETIME = datetime_in_X_days(0)
+        sql += f" AND t.dept_datetime < '{DEPT_DATETIME}'"
+    elif DEPT_DATETIME:
+        sql += f" AND t.dept_datetime = '{DEPT_DATETIME}'"
+    
+    sql += ";"
+    print(sql)
+
     data = exec_sql(sql, mysql)
     headings=(
+        'Flight Number',
+        'Departure Date',
         'Avg Rating'
     )
     return (headings,data)
@@ -161,7 +176,7 @@ def staff_view_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mys
 def staff_view_ratings_and_comments(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mysql) -> tuple:
     sql = f'''
     SELECT rating, comment
-    FROM flight_review join ticket on flight_review.ticket_id = ticket.id
+    FROM flight_review JOIN ticket ON flight_review.ticket_id = ticket.id
     WHERE flight_num = '{FLIGHT_NUM}'
         AND airline = '{AIRLINE}'
         AND dept_datetime = '{DEPT_DATETIME}';

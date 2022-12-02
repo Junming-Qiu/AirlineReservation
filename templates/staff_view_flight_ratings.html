@@ -1,0 +1,48 @@
+{%extends "base.html"%}
+{%block content%}
+<div class="cinput">
+    <h1>Airline Reservation System for Staff</h1>
+    <h2>View Flight Ratings for {{airline}}</h2>
+
+    <form class="cinput" action="/staff_view_flight_ratings" method="POST">
+        <input type="flight_num" name="flight_num" placeholder="Flight Number"/>
+        <input type="dept_time" name="dept_time" placeholder="Departure Time YYYY-MM-DD HH:MM:SS"/>
+        <input type="submit" value="Submit"/>
+
+    </form>
+
+    {%if ratings%}
+    <h3>Results:</h3>
+    
+    <table>
+        <tr>
+            {%for heading in headings%}
+            <td>{{heading}}</td>
+            {%endfor%}
+            <td></td>
+        </tr>
+        {% for rating in ratings%}
+        <tr>  
+            <td>
+                {{rating[0]}}
+            </td>
+            <td>
+                {{rating[1]}}
+            </td>
+            <td>
+                {{rating[2]}}
+            </td>
+    
+            <td>
+                <a href="/staff_view_ratings_and_comments/{{rating[0]}}/{{rating[1]}}">View Ratings</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {%else%}
+    <h3>No Results Found</h3>
+    {%endif%}
+    <a href="/staff">Back</a>
+</div>
+
+{%endblock%}
