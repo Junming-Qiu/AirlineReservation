@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cinput">
+    <h1 class="textcenter">Airline Reservation System for Staff</h1>	
+    <h2>View Report</h2>
+
+    <button onclick="setMonth()">Last Month</button>
+    <button onclick="setYear()">Last Year</button>
+
+    <form class="cinput" action="/staff_view_report_view" method="POST">
+        <input id="s_date" type="s_date" name="s_date" placeholder="Start Date YYYY-MM-DD HH:MM:SS"/>
+        <input id="e_date" type="e_date" name="e_date" placeholder="End Date YYYY-MM-DD HH:MM:SS"/>
+        <input type="submit" value="Submit"/>
+    </form>
+
+    <a href="/staff">Back</a>
+</div>
+<script>
+
+    function setMonth(){
+        let date = new Date()
+        let date_str = date.toJSON().slice(0, 10);
+
+        document.getElementById('e_date').value=date_str + " 00:00:00"
+
+        date.setMonth(date.getMonth() - 1)
+        date.setHours(0,0,0,0)
+        date_str = date.toJSON().slice(0, 10);
+
+        document.getElementById('s_date').value=date_str + " 00:00:00"
+    }
+
+    function setYear(){
+        let date = new Date()
+        let date_str = date.toJSON().slice(0, 10);
+
+        document.getElementById('e_date').value=date_str + " 00:00:00"
+
+        date.setYear(date.getFullYear() - 1)
+        date.setHours(0,0,0,0)
+        date_str = date.toJSON().slice(0, 10);
+
+        document.getElementById('s_date').value=date_str + " 00:00:00"
+    }
+</script>
+{% endblock %}

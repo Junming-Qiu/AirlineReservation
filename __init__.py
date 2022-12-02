@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, url_for, redirect
 from flask_mysqldb import MySQL
 import os
 import sys
+import math
 sys.path.insert(0, os.getcwd())
 from utils.general import *
 from utils.customer import *
@@ -21,7 +22,7 @@ app.static_folder = 'static'
 
 
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '' # TODO: Change this password
+app.config['MYSQL_PASSWORD'] = 'Potatooo123!' # TODO: Change this password
 app.config['MYSQL_DB'] = 'flight_app'
 app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
 
@@ -647,8 +648,60 @@ def staff_view_frequent_customer():
 
         return render_template("staff_view_frequent_customer.html", mfc=mfc, headings=headings, customer_info=customer_info, airline=airline)
 
+    return redirect(url_for("login_staff"))
+
+
+@app.route('/staff_view_report_form')
+def staff_view_tickets_sold():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        return render_template('staff_view_report_form.html')
 
     return redirect(url_for("login_staff"))
+
+@app.route('/staff_view_report_view', methods=['GET', 'POST'])
+def staff_view_tickets_sold_view():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        s_date = ""
+        e_date = ""
+        airline = session['employer']
+
+        try:
+            s_date = request.form['s_date']
+            e_date = request.form['e_date']
+        except:
+            return redirect(url_for('staff_view_tickets_sold'))
+
+        if not parse_input([s_date, e_date]):
+            return redirect(url_for('staff_view_tickets_sold'))
+
+        chart = ""
+
+        _, t_sold = staff_view_tickets_sold_range(s_date, e_date, airline, mysql)
+        t_sold = t_sold[0][0]
+
+        return render_template('staff_view_report.html', t_sold=t_sold, s_date=s_date.split(" ")[0], e_date=e_date.split(" ")[0], chart=chart)
+
+    return redirect(url_for("login_staff"))
+
+@app.route('/staff_view_revenue')
+def staff_view_revenue():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+
+        airline = session['employer']
+        _, m_revenue = staff_view_revenue_pastmonth(airline, mysql)
+        _, y_revenue = staff_view_revenue_pastyear(airline, mysql)
+        m_revenue = round(m_revenue[0][0], 2)
+        y_revenue = round(y_revenue[0][0], 2)
+
+        return render_template('staff_view_revenue.html', m_revenue=m_revenue, y_revenue=y_revenue)
+
+
+
+    return redirect(url_for("login_staff"))
+
 
 ### CUSTOMER USE CASES ###
 @app.route('/customer_view_flight', methods=["POST", "GET"])
@@ -699,7 +752,7 @@ def customer_init_purchase():
         headings, data = public_view_oneway_flights(mysql)
         return render_template('customer_purchase_flight.html', headings=headings, data=data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 
 # DOES NOT HANDLE two-way flights
@@ -805,7 +858,7 @@ def customer_init_delete():
         headings, data = customer_view_my_flights(email, mysql)
         return render_template('customer_delete_flight.html', headings=headings, data=data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 @app.route('/customer_delete_search_flights', methods=["POST", "GET"])
 def customer_delete_search_flights():
@@ -842,7 +895,7 @@ def customer_delete_search_flights():
                                                   AP_ORIGIN=a_org, AP_DEST=a_dest, CITY_ORIGIN=c_org, CITY_DEST=c_dest)
         return render_template('customer_delete_flight.html', headings=headings, data=data)
 
-    return redirect(url_for("/login_customer"))
+    return redirect(url_for("login_customer"))
 
 @app.route('/customer_confirm_delete/<string:ticket_id>',  methods=["POST", "GET"])
 def customer_confirm_delete(ticket_id):
@@ -863,7 +916,7 @@ def customer_spending():
         headings, data = customer_view_spending_pastyear(email, mysql)
         return render_template('customer_spending.html', headings=headings, data=data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 @app.route('/customer_spending_search',  methods=["POST", "GET"])
 def customer_spending_search():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
@@ -882,14 +935,15 @@ def customer_spending_search():
             return render_template('customer_spending.html', error=error)
 
         if not check_datetime_format(s_date) and check_datetime_format(e_date):
-            error = 'Datetime must be formate YYYY-MM-DD HH:MM:SS'
+            error = 'Datetime must be format YYYY-MM-DD HH:MM:SS'
             return render_template('customer_spending.html', error=error)
 
         email = session['username']
         headings, data = customer_view_spending_interval(email, s_date, e_date, mysql)
+        #data = round(data, 2)
         return render_template('customer_spending.html', headings=headings, data=data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 @app.route('/customer_spending_6months',  methods=["POST", "GET"])
 def customer_spending_6months():
@@ -898,9 +952,10 @@ def customer_spending_6months():
 
         email = session['username']
         headings, data = customer_view_spending_past6months(email, mysql)
+        #data = round(data, 2)
         return render_template('customer_spending.html', headings=headings, data=data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 @app.route('/customer_spending_year', methods=["POST", "GET"])
 def customer_spending_year():
@@ -908,9 +963,10 @@ def customer_spending_year():
     if c_logged:
         email = session['username']
         headings, data = customer_view_spending_pastyear(email, mysql)
+        #data = round(data, 2)
         return render_template('customer_spending.html', headings=headings, data=data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 @app.route('/customer_rate_and_comment', methods=["POST", "GET"])
 def customer_rate_and_comment():
@@ -927,7 +983,7 @@ def customer_rate_and_comment():
                                 r_headings=r_headings, r_data=r_data,
                                 f_headings=f_headings, f_data=f_data)
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 @app.route('/customer_stage_rate_and_comment/<string:ticket_id>', methods=["POST", "GET"])
 def customer_stage_rate_and_comment(ticket_id):
@@ -964,7 +1020,7 @@ def customer_create_rate_and_comment(ticket_id):
 
         return redirect(url_for('customer_rate_and_comment'))
 
-    return redirect(url_for('/login_customer'))
+    return redirect(url_for('login_customer'))
 
 
 

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cinput">
+    <h1 class="textcenter">Airline Reservation System for Staff</h1>	
+    <h2>View Report for {{airline}} between {{s_date}} and {{e_date}}</h2>
+
+    {%if t_sold%}
+    <h4>{{t_sold}} Tickets Were Sold During This Time</h4>
+    {%else%}
+    <h4>No Tickets Sold During This Period</h4>
+
+        {%if chart%}
+        <h4>Monthly Chart</h4>
+
+        {%endif%}
+    {%endif%}
+
+   
+
+
+    <a href="/staff_view_report_form">Back</a>
+
+</div>
+
+{% endblock %}

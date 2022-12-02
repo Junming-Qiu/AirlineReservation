@@ -258,11 +258,13 @@ def staff_view_tickets_sold_range(START: str, END: str, AIRLINE: str, mysql) -> 
     headings=('Num Tickets')
     return (headings,data)
 
+# Implemented using JS to autofill field
 def staff_view_tickets_sold_pastmonth(AIRLINE: str, mysql) -> tuple:
     today = datetime.datetime.today()
     past_month = today.replace(month=(today.month - 1))
     return staff_view_mfc_range(str(past_month)[0:-7], str(today)[0:-7], AIRLINE, mysql)
 
+# Implemented using JS to autofill field
 def staff_view_tickets_sold_pastyear(AIRLINE: str, mysql) -> tuple:
     today = datetime.datetime.today()
     past_year = today.replace(year=(today.year - 1))
