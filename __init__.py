@@ -627,6 +627,28 @@ def staff_view_ratings_and_comments_view(flight_num, dept_time):
 
     return redirect(url_for("login_staff"))
 
+@app.route('/staff_view_frequent_customer', methods=['GET', 'POST'])
+def staff_view_frequent_customer():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        _, mfc = staff_view_mfc_pastyear(mysql)
+        mfc = mfc[0]
+        airline = session['employer']
+
+        email = ""
+
+        try:
+            email = request.form['email']
+        except:
+            return render_template('staff_view_frequent_customer.html', mfc=mfc, airline=airline)
+
+        headings, customer_info = staff_view_customer_flight_history(email, airline, mysql)
+
+
+        return render_template("staff_view_frequent_customer.html", mfc=mfc, headings=headings, customer_info=customer_info, airline=airline)
+
+
+    return redirect(url_for("login_staff"))
 
 ### CUSTOMER USE CASES ###
 @app.route('/customer_view_flight', methods=["POST", "GET"])

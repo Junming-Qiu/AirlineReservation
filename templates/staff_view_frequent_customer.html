@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cinput">
+    <h1>Airline Reservation System for Staff</h1>
+    <h2>The Most Frequent Customer In The Past Year for {{airline}} is: <br/>Name: {{mfc[1]}}<br/>Email: {{mfc[2]}}<br/>Phone: {{mfc[3]}}</h2>
+
+    <h2>Search a Customer's Flights</h2>
+    <form class="cinput" action="/staff_view_frequent_customer" method="POST">
+        <input type="email" name="email" placeholder="email"/>
+        <input type="submit" value="Submit"/>
+    </form>
+
+    {%if not customer_info%}
+        <h3>No Customers</h3>
+        {%else%}
+        <table>
+            <tr>
+                <td><b>Flight Name</b></td>
+                <td><b>Departure Time</b></td>
+            </tr>
+            {%for info in customer_info%}        
+                <tr>
+                    <td>{{info[0]}}</td>
+                    <td>{{info[2]}}</td>
+                </tr>
+            {%endfor%}
+        </table>
+        {%endif%}
+
+
+    <a href="/staff">Back</a>
+</div>
+
+{% endblock %}

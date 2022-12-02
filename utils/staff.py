@@ -163,7 +163,6 @@ def staff_view_avg_rating(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME: str, mys
         sql += f" AND t.dept_datetime = '{DEPT_DATETIME}'"
     
     sql += ";"
-    print(sql)
 
     data = exec_sql(sql, mysql)
     headings=(
@@ -191,20 +190,21 @@ def staff_view_ratings_and_comments(FLIGHT_NUM: str, AIRLINE: str, DEPT_DATETIME
 
 
 # USE CASE 7: view most-frequent-customer (mfc) and customer history
+#Only needs past year, according to requirements
 def staff_view_mfc_range(START: str, END: str, mysql) -> tuple:
     sql = f'''
     SELECT tmp.num as 'num_purchases', c.name, c.email, c.phone_number
     FROM
         (SELECT customer_email, count(*) as num
         FROM purchase
-        WHERE purchase_datetime BETWEEEN '{START}' AND '{END}'
+        WHERE purchase_datetime BETWEEN '{START}' AND '{END}'
         GROUP BY customer_email) as tmp
-
         JOIN customer as c
         ON tmp.customer_email = c.email
     ORDER BY num Desc
     LIMIT 1;
     '''
+
     data = exec_sql(sql, mysql)
     headings=(
         'Num Purchases',
@@ -214,16 +214,16 @@ def staff_view_mfc_range(START: str, END: str, mysql) -> tuple:
     )
     return (headings,data)
 
-def staff_view_mfc_pastmonth1() -> tuple:
+def staff_view_mfc_pastmonth1(mysql) -> tuple:
     today = datetime.datetime.today()
     past_month = today.replace(month=(today.month-1))
-    return staff_view_mfc_range(str(past_month)[0:-7], str(today)[0:-7])
+    return staff_view_mfc_range(str(past_month)[0:-7], str(today)[0:-7], mysql)
 
 
-def staff_view_mfc_pastyear() -> tuple:
+def staff_view_mfc_pastyear(mysql) -> tuple:
     today = datetime.datetime.today()
     past_year = today.replace(year=(today.year-1))
-    return staff_view_mfc_range(str(past_year)[0:-7], str(today)[0:-7])
+    return staff_view_mfc_range(str(past_year)[0:-7], str(today)[0:-7], mysql)
 
 def staff_view_customer_flight_history(EMAIL: str, AIRLINE: str, mysql) -> tuple:
     sql = f'''
