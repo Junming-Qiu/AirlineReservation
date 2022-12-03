@@ -1,0 +1,4 @@
+mysql_user: 'root'
+mysql_password: '1234Whydoihavetodothis'
+mysql_db: 'flight_app'
+mysql_port: 3306

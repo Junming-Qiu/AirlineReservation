@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 import os
 import sys
 import math
+import yaml     # pip install pyyaml
 sys.path.insert(0, os.getcwd())
 from utils.general import *
 from utils.customer import *
@@ -20,11 +21,12 @@ staff_tokens = {}
 app = Flask(__name__)
 app.static_folder = 'static'
 
-
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Potatooo123!' # TODO: Change this password
-app.config['MYSQL_DB'] = 'flight_app'
-app.config['MYSQL_PORT'] = 8080 # TODO: Change this port
+# Configure db
+db = yaml.safe_load(open('db_info.yaml'))
+app.config['MYSQL_USER'] = db['mysql_user']
+app.config['MYSQL_PASSWORD'] = db['mysql_password']
+app.config['MYSQL_DB'] = db['mysql_db']
+app.config['MYSQL_PORT'] = db['mysql_port']
 
 mysql = MySQL(app)
 

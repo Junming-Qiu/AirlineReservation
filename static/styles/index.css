@@ -1,5 +1,5 @@
 .textcenter{
-    text-align: center;    
+    text-align: center;
 }
 
 .stack{
@@ -16,16 +16,23 @@
 
 
 .cinput{
-    margin:1%;
+    margin: 1%;
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap:5px;
+    gap: 5px;
 }
+
+
+input {
+    width: 350px;
+}
+
 
 .row{
     display: flex;
 }
+
 
 table {
     border-collapse: collapse;
