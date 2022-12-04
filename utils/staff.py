@@ -270,6 +270,20 @@ def staff_view_tickets_sold_pastyear(AIRLINE: str, mysql) -> tuple:
     past_year = today.replace(year=(today.year - 1))
     return staff_view_mfc_range(str(past_year)[0:-7], str(today)[0:-7], AIRLINE, mysql)
 
+# Monthly ticket spending for the past year (for bar chart)
+def staff_view_tickets_sold_monthly(AIRLINE: str, mysql) -> tuple:
+    today = datetime.datetime.today()
+    start = today.replace(year=(today.year - 1), day=1)  # 1 year ago, 1st day of month
+    end = increment_dt_month(start)
+    monthly_totals = []
+    for i in range(12):
+        start = increment_dt_month(start)
+        end = increment_dt_month(end)
+        _, t_sold = staff_view_tickets_sold_range(start, end, AIRLINE, mysql)
+        t_sold = t_sold[0][0]
+        monthly_totals.append(t_sold)
+    return monthly_totals, today.month
+
 
 # USE CASE 8: view revenue
 def staff_view_revenue_range(START: str, END: str, AIRLINE: str, mysql) -> tuple:

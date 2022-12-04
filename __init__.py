@@ -678,14 +678,31 @@ def staff_view_tickets_sold_view():
         if not parse_input([s_date, e_date]):
             return redirect(url_for('staff_view_tickets_sold'))
 
-        chart = ""
-
         _, t_sold = staff_view_tickets_sold_range(s_date, e_date, airline, mysql)
         t_sold = t_sold[0][0]
 
-        return render_template('staff_view_report.html', t_sold=t_sold, s_date=s_date.split(" ")[0], e_date=e_date.split(" ")[0], chart=chart)
+        return render_template('staff_view_report.html', t_sold=t_sold, s_date=s_date.split(" ")[0],
+                               e_date=e_date.split(" ")[0])
 
     return redirect(url_for("login_staff"))
+
+
+@app.route('/staff_view_bar_chart', methods=['GET'])
+def staff_view_monthly_sales():
+    _, s_logged = store_verify(session, customer_tokens, staff_tokens)
+    if s_logged:
+        airline = session['employer']
+
+        monthly_sales, start_month = staff_view_tickets_sold_monthly(airline, mysql)
+        year = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                  'August', 'September', 'October', 'November', 'December']
+        labels = year[(start_month - 1):]
+        labels.extend(year[:(start_month - 1)])
+
+        return render_template('chart.html', data=monthly_sales, months=labels)
+
+    return redirect(url_for("login_staff"))
+
 
 @app.route('/staff_view_revenue')
 def staff_view_revenue():
@@ -699,8 +716,6 @@ def staff_view_revenue():
         y_revenue = round(y_revenue[0][0], 2)
 
         return render_template('staff_view_revenue.html', m_revenue=m_revenue, y_revenue=y_revenue)
-
-
 
     return redirect(url_for("login_staff"))
 

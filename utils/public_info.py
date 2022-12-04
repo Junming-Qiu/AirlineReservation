@@ -7,8 +7,8 @@ They should be called by some function that:
     1. reads user input
     2. calls this functions
     3. returns render_template( 'table_template',
-                                 headings=rtn[0],
-                                 data=rtn[1] ) 
+                                 headings=return[0],
+                                 data=return[1] ) 
 
 Inputs:
     mysql       : MySQL connection

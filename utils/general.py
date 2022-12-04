@@ -103,3 +103,11 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
                 return False
     print(f'Successfully parsed: {inputs}')
     return True
+
+# increment month in datetime object
+def increment_dt_month(dt: str) -> str:
+    if dt.month < 12:
+        dt = dt.replace(month=(dt.month + 1))
+    else:
+        dt = dt.replace(month=1, year=(dt.year + 1))
+    return dt
