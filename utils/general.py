@@ -51,7 +51,7 @@ def datetime_in_X_days(NUM_DAYS: int) -> str:
 
 
 def check_datetime_format(DATETIME: str) -> bool:
-    if DATETIME is None:
+    if DATETIME is None or DATETIME == '':
         return True
 
     try:

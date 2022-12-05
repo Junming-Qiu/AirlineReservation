@@ -239,10 +239,18 @@ def customer_cancel_ticket(EMAIL: str, TID: str, mysql):
     if _validate_ticket_ownership(EMAIL, TID, mysql): # ticket was purchased by customer
         if _validate_ticket_exists(TID, mysql): # ticket was not already cancelled
             sql=f'''
+            DELETE FROM purchase
+            WHERE ticket_id='{TID}' AND customer_email='{EMAIL}';
+            '''
+            exec_sql(sql, mysql, commit=True)
+
+            sql=f'''
             DELETE FROM ticket
             WHERE id='{TID}';
             '''
+        
             exec_sql(sql, mysql, commit=True)
+
         else:
             raise Exception('Ticket already was cancelled')
     else:
@@ -297,10 +305,22 @@ def customer_view_spending_interval(EMAIL: str, START: str, END: str, mysql) -> 
     sql=f'''
     SELECT sum(sold_price)
     FROM purchase
-    WHERE purchase_datetime BETWEEN '{START}' AND '{END}'
-    GROUP BY customer_email
-    HAVING customer_email='{EMAIL}';
     '''
+
+    if START != "" or END != "":
+        sql += "WHERE"
+
+    if START != "":
+        sql += f" purchase_datetime >= '{START}'"
+  
+    if END != "":
+        if START != "":
+           sql += f" AND" 
+        sql += f" purchase_datetime <= '{END}'"
+        
+    
+    sql += f" GROUP BY customer_email HAVING customer_email='{EMAIL}';"
+
     try:
         data=exec_sql(sql, mysql)[0][0]
     except:

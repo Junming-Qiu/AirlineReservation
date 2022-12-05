@@ -106,12 +106,12 @@ def staff_update_flight_status(FNUM: str, AIRLINE: str,
 
 
 
-# USE CASE 4: add an airline
+# USE CASE 4: add an airplane
 def staff_create_airplane(ID: str, AIRLINE: str, NUM_SEATS: str,
                           AGE: str, MANUFACTURER: str, mysql) -> tuple:
     insert_sql = f'''
     INSERT INTO airplane
-    VALUES ('{ID}', '{AIRLINE}', {NUM_SEATS}, {AGE},'{MANUFACTURER}');
+    VALUES ('{ID}', '{AIRLINE}', {NUM_SEATS}, '{AGE}','{MANUFACTURER}');
     '''
     exec_sql(insert_sql, mysql, commit=True)
 

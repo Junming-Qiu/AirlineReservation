@@ -951,7 +951,8 @@ def customer_spending_search():
             error = 'Bad Inputs'
             return render_template('customer_spending.html', error=error)
 
-        if not check_datetime_format(s_date) and check_datetime_format(e_date):
+
+        if not (check_datetime_format(s_date) and check_datetime_format(e_date)):
             error = 'Datetime must be format YYYY-MM-DD HH:MM:SS'
             return render_template('customer_spending.html', error=error)
 
@@ -1033,7 +1034,10 @@ def customer_create_rate_and_comment(ticket_id):
             return render_template('customer_stage_rate_and_comment.html', error=error)
 
         email = session['username']
-        customer_create_review(email, ticket_id, rating, comment, mysql)
+        try:
+            customer_create_review(email, ticket_id, rating, comment, mysql)
+        except:
+            pass
 
         return redirect(url_for('customer_rate_and_comment'))
 
