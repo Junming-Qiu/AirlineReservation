@@ -317,8 +317,7 @@ def customer_view_spending_interval(EMAIL: str, START: str, END: str, mysql) -> 
         if START != "":
            sql += f" AND" 
         sql += f" purchase_datetime <= '{END}'"
-        
-    
+
     sql += f" GROUP BY customer_email HAVING customer_email='{EMAIL}';"
 
     try:
@@ -341,3 +340,32 @@ def customer_view_spending_pastyear(EMAIL: str, mysql) -> tuple:
     start = datetime_in_X_days(-365)
     end = datetime_in_X_days(0)
     return customer_view_spending_interval(EMAIL, start, end, mysql)
+
+# customer spending over interval broken down monthly (for bar chart)
+def customer_spending_monthly(EMAIL: str, START: datetime, END: datetime, mysql) -> list:
+    m_start = START
+    m_end = increment_dt_month(START.replace(day=1))  # 1st of month after start month
+    monthly_totals = []
+    while m_end < END:
+        m_spending = customer_view_spending_interval(EMAIL, m_start, m_end, mysql)[1]
+        monthly_totals.append(m_spending)
+        m_start = increment_dt_month(m_start.replace(day=1))
+        m_end = increment_dt_month(m_end)
+    m_end = END
+    m_spending = customer_view_spending_interval(EMAIL, m_start, m_end, mysql)[1]
+    monthly_totals.append(m_spending)
+    return monthly_totals
+
+def spending_barchart_labels(start_month: int, end_month: int) -> list:
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October', 'November', 'December']
+
+    start_month -= 1    # make range 0-11 instead of 1-12
+    end_month -= 1
+    if start_month < end_month:
+        labels = months[start_month:(end_month + 1)]
+    else:
+        labels = months[start_month:]
+        labels.extend(months[:(end_month + 1)])
+
+    return labels

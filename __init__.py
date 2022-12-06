@@ -699,7 +699,7 @@ def staff_view_monthly_sales():
         labels = year[(start_month - 1):]
         labels.extend(year[:(start_month - 1)])
 
-        return render_template('chart.html', data=monthly_sales, months=labels)
+        return render_template('staff_chart.html', data=monthly_sales, months=labels)
 
     return redirect(url_for("login_staff"))
 
@@ -925,6 +925,7 @@ def customer_confirm_delete(ticket_id):
 
     return redirect(url_for("login_customer"))
 
+
 @app.route('/customer_spending',  methods=["POST", "GET"])
 def customer_spending():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
@@ -934,6 +935,7 @@ def customer_spending():
         return render_template('customer_spending.html', headings=headings, data=data)
 
     return redirect(url_for('login_customer'))
+
 @app.route('/customer_spending_search',  methods=["POST", "GET"])
 def customer_spending_search():
     c_logged, _ = store_verify(session, customer_tokens, staff_tokens)
@@ -951,17 +953,28 @@ def customer_spending_search():
             error = 'Bad Inputs'
             return render_template('customer_spending.html', error=error)
 
-
         if not (check_datetime_format(s_date) and check_datetime_format(e_date)):
             error = 'Datetime must be format YYYY-MM-DD HH:MM:SS'
             return render_template('customer_spending.html', error=error)
 
         email = session['username']
         headings, data = customer_view_spending_interval(email, s_date, e_date, mysql)
-        #data = round(data, 2)
+
+        # only shows bar chart if 2 dates entered
+        if s_date != "" and e_date != "" and s_date is not None and e_date is not None:
+            s_date = datetime.datetime.strptime(s_date[:20], '%Y-%m-%d %H:%M:%S')
+            e_date = datetime.datetime.strptime(e_date[:20], '%Y-%m-%d %H:%M:%S')
+            b_labels = spending_barchart_labels(s_date.month, e_date.month)
+            monthly_s = customer_spending_monthly(email, s_date, e_date, mysql)
+
+            return render_template('customer_spending.html', headings=headings, data=data,
+                                   months=b_labels, b_data=monthly_s)
+
         return render_template('customer_spending.html', headings=headings, data=data)
+        #data = round(data, 2)
 
     return redirect(url_for('login_customer'))
+
 
 @app.route('/customer_spending_6months',  methods=["POST", "GET"])
 def customer_spending_6months():
@@ -971,7 +984,17 @@ def customer_spending_6months():
         email = session['username']
         headings, data = customer_view_spending_past6months(email, mysql)
         #data = round(data, 2)
-        return render_template('customer_spending.html', headings=headings, data=data)
+
+        today = datetime.datetime.today()   # bar chart data
+        e_date = today
+        s_date = today.replace(year=(today.year - 1), day=1)
+        for i in range(6):
+            s_date = increment_dt_month(s_date)
+        b_labels = spending_barchart_labels(s_date.month, e_date.month)
+        monthly_s = customer_spending_monthly(email, s_date, e_date, mysql)
+
+        return render_template('customer_spending.html', headings=headings, data=data,
+                               months=b_labels, b_data=monthly_s)
 
     return redirect(url_for('login_customer'))
 
@@ -982,9 +1005,18 @@ def customer_spending_year():
         email = session['username']
         headings, data = customer_view_spending_pastyear(email, mysql)
         #data = round(data, 2)
-        return render_template('customer_spending.html', headings=headings, data=data)
+
+        today = datetime.datetime.today()   # bar chart
+        e_date = today
+        s_date = today.replace(year=(today.year - 1), day=1)
+        b_labels = spending_barchart_labels(s_date.month, e_date.month)
+        monthly_s = customer_spending_monthly(email, s_date, e_date, mysql)
+
+        return render_template('customer_spending.html', headings=headings, data=data,
+                               months=b_labels, b_data=monthly_s)
 
     return redirect(url_for('login_customer'))
+
 
 @app.route('/customer_rate_and_comment', methods=["POST", "GET"])
 def customer_rate_and_comment():
@@ -1042,8 +1074,6 @@ def customer_create_rate_and_comment(ticket_id):
         return redirect(url_for('customer_rate_and_comment'))
 
     return redirect(url_for('login_customer'))
-
-
 
 
 
