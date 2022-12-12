@@ -2,7 +2,7 @@ insert into airline values ('United');
 
 `staff phone numbers? Email?`
 insert into airline_staff values 
-    ('admin', 'e2fc714c4727ee9395f324cd2e7f331f', 'Roe', 'Jones', '1978-05-25', 'United');
+    ('admin', '8c02b3bfd0b00a36d01d16f0d108814e', 'Roe', 'Jones', '1978-05-25', 'United');
 
 insert into airplane values
     ('1', 'United', 4, '2012-01-01', 'Boeing'),
@@ -21,13 +21,13 @@ insert into airport values
     ('SHEN', 'Shenzhen', 'China', 'international');
 
 insert into customer values
-    ('testcustomer@nyu.edu', 'Test Customer 1', '81dc9bdb52d04dc20036dbd8313ed055', '1555', 'Brooklyn',
+    ('testcustomer@nyu.edu', 'Test Customer 1', '1f1c6dd651a798b959ffe15fe03e49ec', '1555', 'Brooklyn',
     'New York', 'Jay St', 'USA', '54321', '2025-12-24', '1999-12-19', '123-4321-4321'),
-    ('user1@nyu.edu', 'User 1', '81dc9bdb52d04dc20036dbd8313ed055', '5405', 'Brooklyn',
+    ('user1@nyu.edu', 'User 1', '1f1c6dd651a798b959ffe15fe03e49ec', '5405', 'Brooklyn',
     'New York', 'Jay Street', 'USA', '54322', '2025-12-25', '1999-11-19', '123-4322-4322'),
-    ('user2@nyu.edu', 'User 2', '81dc9bdb52d04dc20036dbd8313ed055', '1702', 'Brooklyn',
+    ('user2@nyu.edu', 'User 2', '1f1c6dd651a798b959ffe15fe03e49ec', '1702', 'Brooklyn',
     'New York', 'Jay Street', 'USA', '54323', '2025-10-24', '1999-10-19', '123-4323-4323'),
-    ('user3@nyu.edu', 'User 3', '81dc9bdb52d04dc20036dbd8313ed055', '1890', 'Brooklyn',
+    ('user3@nyu.edu', 'User 3', '1f1c6dd651a798b959ffe15fe03e49ec', '1890', 'Brooklyn',
     'New York', 'Jay Street', 'USA', '54324', '2025-09-24', '1999-09-19', '123-4324-4324');
 
 insert into flight values
