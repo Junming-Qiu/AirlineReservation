@@ -93,9 +93,9 @@ def parse_input(inputs: list[str], ispass=False) -> bool:
                 print(f"a. failed to parse {word}")
                 return False
 
-            if len(word) <= 8:
-                print(f"b. failed to parse {word}")
-                return False
+            # if len(word) <= 8:
+            #     print(f"b. failed to parse {word}")
+            #     return False
 
         for c in word:
             if c not in alpha_lower and c not in alpha_upper and c not in nums and c not in whitelist and c in restrict:
