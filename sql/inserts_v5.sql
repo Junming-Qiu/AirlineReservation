@@ -2,7 +2,7 @@ insert into airline values ('United');
 
 `staff phone numbers? Email?`
 insert into airline_staff values 
-    ('admin', '8c02b3bfd0b00a36d01d16f0d108814e', 'Roe', 'Jones', '1978-05-25', 'United');
+    ('admin', '043160a4a5171670021f28f7d6a3f69b', 'Roe', 'Jones', '1978-05-25', 'United');
 
 insert into airplane values
     ('1', 'United', 4, '2012-01-01', 'Boeing'),
@@ -21,13 +21,13 @@ insert into airport values
     ('SHEN', 'Shenzhen', 'China', 'international');
 
 insert into customer values
-    ('testcustomer@nyu.edu', 'Test Customer 1', '1f1c6dd651a798b959ffe15fe03e49ec', '1555', 'Brooklyn',
+    ('testcustomer@nyu.edu', 'Test Customer 1', '5df21263ad7262f11273a6e4339002e2', '1555', 'Brooklyn',
     'New York', 'Jay St', 'USA', '54321', '2025-12-24', '1999-12-19', '123-4321-4321'),
-    ('user1@nyu.edu', 'User 1', '1f1c6dd651a798b959ffe15fe03e49ec', '5405', 'Brooklyn',
+    ('user1@nyu.edu', 'User 1', '5df21263ad7262f11273a6e4339002e2', '5405', 'Brooklyn',
     'New York', 'Jay Street', 'USA', '54322', '2025-12-25', '1999-11-19', '123-4322-4322'),
-    ('user2@nyu.edu', 'User 2', '1f1c6dd651a798b959ffe15fe03e49ec', '1702', 'Brooklyn',
+    ('user2@nyu.edu', 'User 2', '5df21263ad7262f11273a6e4339002e2', '1702', 'Brooklyn',
     'New York', 'Jay Street', 'USA', '54323', '2025-10-24', '1999-10-19', '123-4323-4323'),
-    ('user3@nyu.edu', 'User 3', '1f1c6dd651a798b959ffe15fe03e49ec', '1890', 'Brooklyn',
+    ('user3@nyu.edu', 'User 3', '5df21263ad7262f11273a6e4339002e2', '1890', 'Brooklyn',
     'New York', 'Jay Street', 'USA', '54324', '2025-09-24', '1999-09-19', '123-4324-4324');
 
 insert into flight values
@@ -51,7 +51,56 @@ insert into flight values
     '2021-12-26 13:25:25', 300, 'SHEN', 'BEI', 'on time');
 
 insert into ticket values 
-    ()
+    ('00001', '102', 'United', '2022-09-12 13:25:25'),
+    ('00002', '102', 'United', '2022-09-12 13:25:25'),
+    ('00003', '102', 'United', '2022-09-12 13:25:25'),
+    ('00004', '104', 'United', '2022-10-04 13:25:25'),
+    ('00005', '104', 'United', '2022-10-04 13:25:25'),
+    ('00006', '106', 'United', '2022-08-04 13:25:25'),
+    ('00007', '106', 'United', '2022-08-04 13:25:25'),
+    ('00008', '839', 'United', '2022-12-26 13:25:25'),
+    ('00009', '102', 'United', '2022-09-12 13:25:25'),
+    ('00011', '134', 'United', '2022-07-12 13:25:25'),
+    ('00012', '715', 'United', '2022-09-28 13:25:25'),
+    ('00014', '206', 'United', '2022-02-04 13:25:25'),
+    ('00015', '206', 'United', '2022-02-04 13:25:25'),
+    ('00016', '206', 'United', '2022-02-04 13:25:25'),
+    ('00017', '207', 'United', '2022-03-04 13:25:25'),
+    ('00018', '207', 'United', '2022-03-04 13:25:25'),
+    ('00019', '296', 'United', '2022-12-30 13:25:25'),
+    ('00020', '296', 'United', '2022-12-30 13:25:25');
+
+insert into card_info values
+    ('1111222233334444', '3/23', 'Test Customer 1', 'credit'),
+    ('1111222233335555', '3/23', 'User 1', 'credit');
+
+insert into purchase values
+    ('testcustomer@nyu.edu', '00001', '2022-08-04 11:55:55', 300, 300, '1111222233334444'),
+    ('user1@nyu.edu', '00002', '2022-08-03 11:55:55', 300, 300, '1111222233335555'),
+    ('user2@nyu.edu', '00003', '2022-09-04 11:55:55', 300, 300, '1111222233335555'),
+    ('user1@nyu.edu', '00004', '2022-08-21 11:55:55', 300, 300, '1111222233335555'),
+    ('testcustomer@nyu.edu', '00005', '2022-09-28 11:55:55', 300, 300, '1111222233334444'),
+    ('testcustomer@nyu.edu', '00006', '2022-08-02 11:55:55', 350, 350, '1111222233334444'),
+    ('user3@nyu.edu', '00007', '2022-07-03 11:55:55', 300, 350, '1111222233335555'),
+    ('user3@nyu.edu', '00008', '2021-12-03 11:55:55', 300, 300, '1111222233335555'),
+    ('user3@nyu.edu', '00009', '2022-07-04 11:55:55', 300, 300, '1111222233335555'),
+    ('user3@nyu.edu', '00011', '2022-05-23 11:55:55', 300, 300, '1111222233335555'),
+    ('testcustomer@nyu.edu', '00012', '2022-05-02 11:55:55', 500, 500, '1111222233334444'),
+    ('user3@nyu.edu', '00014', '2022-11-20 11:55:55', 400, 400, '1111222233335555'),
+    ('user1@nyu.edu', '00015', '2022-11-21 11:55:55', 400, 400, '1111222233335555'),
+    ('user2@nyu.edu', '00016', '2022-09-19 11:55:55', 400, 400, '1111222233335555'),
+    ('user1@nyu.edu', '00017', '2022-08-11 11:55:55', 300, 300, '1111222233335555'),
+    ('testcustomer@nyu.edu', '00018', '2022-09-25 11:55:55', 300, 300, '1111222233334444'),
+    ('user1@nyu.edu', '00019', '2022-11-12 11:55:55', 3000, 3000, '1111222233334444'),
+    ('testcustomer@nyu.edu', '00020', '2022-07-12 11:55:55', 3000, 300, '1111222233334444');
+
+insert into flight_review values 
+    ('testcustomer@nyu.edu', '00001', '4', 'Very Comfortable'),
+    ('user1@nyu.edu', '00002', '5', 'Relaxing, check-in and onboarding very professional'),
+    ('user2@nyu.edu', '00003', '3', 'Satisfied and will use the same flight again'),
+    ('testcustomer@nyu.edu', '00005', '1', 'Customer Care services are not good'),
+    ('user1@nyu.edu', '00004', '5', 'Comfortable journey and Professional')
+
 
 
 
