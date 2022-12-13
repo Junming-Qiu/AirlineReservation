@@ -1,6 +1,5 @@
 insert into airline values ('Delta');
 
-`staff phone numbers? Email?`
 insert into airline_staff values 
     ('admin', '043160a4a5171670021f28f7d6a3f69b', 'Roe', 'Jones', '1978-05-25', 'Delta');
 
@@ -16,7 +15,7 @@ insert into airplane values
     ('2', 'Delta', 4, '2010-01-01', 'Airbus'),
     ('3', 'Delta', 50, '2014-01-01', 'Boeing');
 
-`Type can be both??`
+
 insert into airport values
     ('JFK', 'NYC', 'USA', 'international'),
     ('BOS', 'Boston', 'USA', 'international'),
@@ -53,7 +52,7 @@ insert into flight values
     ('296', 'Delta', '1', '2022-12-30 16:50:25', 
     '2022-12-30 13:25:25', 3000, 'PVG', 'SFO', 'on time'),
     ('715', 'Delta', '1', '2022-09-28 16:50:25', 
-    '2022-09-30 13:25:25', 500, 'PVG', 'BEI', 'delayed'),
+    '2022-09-28 13:25:25', 500, 'PVG', 'BEI', 'delayed'),
     ('839', 'Delta', '3', '2021-12-26 16:50:25', 
     '2021-12-26 13:25:25', 300, 'SHEN', 'BEI', 'on time');
 
