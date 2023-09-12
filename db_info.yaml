@@ -1,4 +1,4 @@
 mysql_user: 'root'
-mysql_password: 'Potatooo123!'
+mysql_password: ''
 mysql_db: 'flight_app'
 mysql_port: 3306
